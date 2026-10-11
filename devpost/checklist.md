@@ -64,7 +64,7 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
   Why now: Needed for the public repo and the video; written last so it describes what exists.
   PRD ref: `prd.md > What We're Building`
   Spec ref: `spec.md > Where It Runs and How Someone Tries It`, `spec.md > File Structure`
-  Build: `README.md` (incl. a short "How this was built" section: built with Claude Code running the Devpost Learn skill pack; planning docs in `devpost/`; an AI agent answered the planning interviews from the learner's background and the learner approved them; plus the live-mode sentence from `spec.md > Live-Mode Disclosure`), `.env.example`, `LICENSE`.
+  Build: `README.md` (incl. a short "How this was built" section: built with Claude Code running the Devpost Learn skill pack; planning docs in `devpost/`; exactly this sentence: "An AI agent answered the planning interviews on my behalf, based on my background.", nothing more about approval; plus the live-mode sentence from `spec.md > Live-Mode Disclosure`), `.env.example`, `LICENSE`.
   Verify (mechanical): fresh clone into a temp folder, `npm ci`, `npm test`, `npm start` on another port, `curl /api/mode` returns `offline`; no Turkish characters and no secrets in tracked files.
   Learner check: Read the README as if you had never seen the project. Is anything missing to run it?
   Commit: `Add README, env example and license`
