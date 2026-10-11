@@ -84,11 +84,12 @@ PRD ref: `prd.md > Priority Rules`, `prd.md > Interview`, `prd.md > Honest Redir
 PRD ref: `prd.md > Source Tags`, `prd.md > Honest Redirect`, `prd.md > Card`.
 
 ### Emergency Check
-`public/lib/emergency.js`. `hasEmergencyKeyword(text)`: lowercase, then match fixed **phrases**, not single words, so ordinary answers do not trip it (gas comes up often because of Q7):
+`public/lib/emergency.js`. `hasEmergencyKeyword(text)`: fold Turkish letters to ASCII, lowercase, then match fixed **phrases**, not single words, so ordinary answers do not trip it (gas comes up often because of Q7):
 - gas together with smell or leak: `smell gas`, `smell of gas`, `smells of gas`, `gas smell`, `gas leak`, `leaking gas`, `gas is leaking`;
 - `trapped`; `injured`, `injury`, `injuries`; `bleeding`;
 - `on fire`, `fire in` (e.g. "fire in the kitchen");
-- `collapsed`, `collapsing`.
+- `collapsed`, `collapsing`;
+- Turkish, after folding, because people in Istanbul often type in Turkish: `gaz kokusu`/`gaz kokuyor`, `gaz kacagi`/`gaz kaciyor`, `mahsur`, `enkaz altinda`, `yarali`, `yaralandi`/`yaralanmis`, `kanama`/`kanamasi`/`kaniyor`, `yangin var`/`yangin cikti`, `cokuyor`, and `coktu`/`cokmus` only after a building part (`bina`, `duvar`, `balkon`, `tavan`, `kolon`, `merdiven`). Single words that are ordinary stay out: `yangin` alone ("yangin tupu" is a fire extinguisher), `coktu` alone (it also means "there were many" once folded), `cokme` ("cokme riski" is a question, not an emergency). The Turkish letters are written as `\u` escapes so the repository stays ASCII.
 Runs in the browser before any Claude call, in both modes. The page combines `keyword || modelFlag`; there is no code path where the model flag lowers a keyword match.
 PRD ref: `prd.md > Emergency Stop`.
 
@@ -175,7 +176,7 @@ before-the-shake/
 │   └── prompts.js           # system prompts + JSON schemas
 ├── test/
 │   ├── rules.test.js        # demo pair A/B, facts never change order, A2 always, all "Not sure", F1-F3 conditions
-│   ├── emergency.test.js    # phrases incl. "I smell gas"; no hit on "we have a gas stove", "fire extinguisher", "the room smells damp"
+│   ├── emergency.test.js    # phrases incl. "I smell gas"; no hit on "we have a gas stove", "fire extinguisher", "the room smells damp"; Turkish phrases and Turkish negatives
 │   └── validate.test.js     # missing id, reordered ids, extra id, digit, blocked phrase, broken JSON
 ├── devpost/                 # scope.md, prd.md, spec.md (public); learner-profile.md (gitignored)
 ├── .env.example             # ANTHROPIC_API_KEY=, CLAUDE_MODEL_FAST=claude-haiku-5-5, CLAUDE_MODEL_CARD=claude-opus-5-5, PORT=3000

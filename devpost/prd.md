@@ -171,7 +171,7 @@ Source: `scope.md > The Unique Kernel` ("oh, that's cool" moment).
 Source: `scope.md > The POC Boundary`.
 - No answer chip mentions an emergency, on purpose: this is a preparedness tool.
 - Two ways in: the small "Something happening right now?" link on every question screen, and the free text.
-- Free text goes through a fixed keyword check (gas, smell, trapped, injured, bleeding, fire, collapse) in both modes, and the check always wins. In live mode the model can also raise the emergency flag, but it can never clear one.
+- Free text goes through a fixed keyword check (gas, smell, trapped, injured, bleeding, fire, collapse, plus the same in Turkish) in both modes, and the check always wins. In live mode the model can also raise the emergency flag, but it can never clear one.
 - The screen shows only "Call 112 now" and "Back to the questions". 112 is the only number shown anywhere in the app.
   - [ ] Tapping "Something happening right now?" on any question screen shows the Emergency screen immediately.
   - [ ] Typing "I smell gas" in the free-text box shows the Emergency screen, in live and offline mode.

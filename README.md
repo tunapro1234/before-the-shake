@@ -16,7 +16,7 @@ A survey by the Istanbul Metropolitan Municipality's statistics office (November
 
 It never says whether a building is safe. It gives no score and no percentage. Only a licensed engineer with a proper assessment can judge a building, and the app says so whenever someone asks, through the "Can you tell me if my building is safe?" link on every question or in the free-text box.
 
-If someone types that they smell gas, or that someone is trapped or injured, the interview stops and the screen shows one thing: **Call 112 now**. 112 is the only phone number in the app.
+If someone types that they smell gas, or that someone is trapped or injured (in English or Turkish), the interview stops and the screen shows one thing: **Call 112 now**. 112 is the only phone number in the app.
 
 It asks for no address and no account. Answers and the card stay in this browser (`localStorage`); "Clear my answers" removes them.
 
