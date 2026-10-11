@@ -37,3 +37,11 @@ export function asksForVerdict(text) {
   const t = normalize(text);
   return VERDICT_PHRASES.some((re) => re.test(t));
 }
+
+// Live mode: the model's flags can add to the fixed checks, never clear them.
+export function combineFlags(text, modelFlags) {
+  return {
+    emergency: hasEmergencyKeyword(text) || modelFlags?.emergency === true,
+    verdict_request: asksForVerdict(text) || modelFlags?.verdict_request === true,
+  };
+}

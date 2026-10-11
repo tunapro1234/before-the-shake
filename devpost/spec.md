@@ -117,7 +117,7 @@ PRD ref: `prd.md > Live and Offline Modes`, `prd.md > States and Boundaries` (pe
 
 ### Claude Tasks
 `server/claude.js` with `server/prompts.js`. One SDK client; three task functions. Prompts are fixed on the server; the browser only sends data, never prompt text.
-- **`followup`** (model `CLAUDE_MODEL_FAST`, `output_config.effort: "low"` if accepted, `max_tokens: 1024`): input `{ followupId, fixedQuestion, reasonFact }`; returns `{ question }`. System prompt: reword the question for a calm, plain-English interview, keep its meaning and answer options, one sentence ending in "?", no numbers, no judgment of the building.
+- **`followup`** (model `CLAUDE_MODEL_FAST`, `output_config.effort: "low"` if accepted, `max_tokens: 1024`): input `{ followupId }`, the server reads the fixed question and its reason from `questions.js`; returns `{ question }`. System prompt: reword the question for a calm, plain-English interview, keep its meaning and answer options, one sentence ending in "?", no numbers, no judgment of the building.
 - **`flags`** (model `CLAUDE_MODEL_FAST`, effort `"low"` if accepted, `max_tokens: 1024`): input `{ text }`; returns `{ emergency: boolean, verdict_request: boolean }` via JSON schema. System prompt: emergency = someone is trapped, injured, or there is gas, fire or collapse happening now; verdict_request = the person asks whether the building is safe or for a rating.
 - **`card`** (model `CLAUDE_MODEL_CARD`, effort `"medium"`, `max_tokens: 4096`): input = rule output's action ids, titles, variants and "why" lines; returns `{ actions: [{ id, explanation }] }` via JSON schema (`additionalProperties: false`, `id` an enum of the rule output's ids). System prompt: one or two plain sentences per action on what to do this week, in the given order, keep every id, add no actions, no numbers or quantities, never say whether a building is safe.
 - Every response: check `stop_reason` first; `refusal`, `max_tokens` or unparseable output → `{ error }`. API errors (rate limit, 5xx, connection) → `{ error }`; the SDK's default 2 retries stay on.
@@ -252,4 +252,4 @@ Clarification: that is enough for order and completeness, because the comparison
 Start screen, under the badge, in live mode, and the same sentence in README: "Live mode: some of your answers are sent to Claude, Anthropic's AI, to write the wording. This app saves nothing on a server."
 
 ### Open issues
-- **Verify early in the build:** `output_config.format` shape in the pinned SDK; `output_config.effort` on the fast model (C2); `--env-file-if-exists` in Node 22.22.
+- **Verify early in the build:** `output_config.format` shape in the pinned SDK; `output_config.effort` on the fast model (C2); `--env-file-if-exists` in Node 22.22. Result: `output_config.format` and `--env-file-if-exists` confirmed; C2 handled by a one-time retry without effort (see `checklist.md > Revisions`).

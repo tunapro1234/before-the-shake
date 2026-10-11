@@ -131,5 +131,8 @@ export const EMERGENCY = {
   back: 'Back to the questions',
 };
 
+export const LIVE_DISCLOSURE =
+  'Live mode: some of your answers are sent to Claude, Anthropic\'s AI, to write the wording. This app saves nothing on a server.';
+export const WRITING_NOTE = 'Claude is writing the explanations. The fixed wording is shown until then.';
 export const OFFLINE_NOTICE = 'Live connection lost. Continuing in offline mode; your answers are kept.';
 export const FIXED_WORDING_NOTE = 'Fixed wording';

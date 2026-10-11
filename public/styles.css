@@ -114,3 +114,6 @@ a.tag:hover { text-decoration: underline; }
   .sources { font-size: 7pt; }
   a { color: inherit; text-decoration: none; }
 }
+.notice { border: 1px solid var(--rule); background: #fff; padding: 10px 14px; font-size: 0.9rem; }
+#card-status:empty { display: none; }
+@media print { .notice, #card-status { display: none !important; } }

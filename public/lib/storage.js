@@ -1,5 +1,5 @@
 // Saved state in this browser only. One localStorage key, one JSON object:
-// { mode, step, answers, flags, card: { ruleOutput, explanations, wording, ticks } }.
+// { mode, step, answers, flags, card: { ruleOutput, explanations, wording, fallback, ticks } }.
 // Every read and write is wrapped: private windows and blocked storage just mean nothing is kept.
 
 export const KEY = 'before-the-shake.v1';
@@ -33,7 +33,8 @@ export function load(storage) {
     state.card = {
       ruleOutput: data.card.ruleOutput,
       explanations: isObject(data.card.explanations) ? data.card.explanations : {},
-      wording: data.card.wording === 'live' ? 'live' : 'fixed',
+      wording: data.card.wording === 'model' ? 'model' : 'fixed',
+      fallback: data.card.fallback === true,
       ticks: data.card.ticks ?? {},
     };
   }

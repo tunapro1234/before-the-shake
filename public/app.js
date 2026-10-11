@@ -2,10 +2,11 @@
 
 import { getQuestion } from './lib/questions.js';
 import { questionSequence, buildCard, buildingFacts } from './lib/rules.js';
-import { hasEmergencyKeyword, asksForVerdict } from './lib/emergency.js';
+import { hasEmergencyKeyword, combineFlags } from './lib/emergency.js';
+import { checkCardText, checkFollowupText } from './lib/validate.js';
 import {
   ACTIONS, VARIANTS, WHY, ENGINEER, PROCESS, PROCESS_TITLE, PROCESS_SOURCE, FACTS, CANNOT_JUDGE, START, ORDER_NOTE,
-  HONEST_PANEL, EMERGENCY,
+  HONEST_PANEL, EMERGENCY, LIVE_DISCLOSURE, WRITING_NOTE, OFFLINE_NOTICE, FIXED_WORDING_NOTE,
 } from './lib/content.js';
 import { SOURCES, APP_RULE, tagLabel } from './lib/sources.js';
 import * as storage from './lib/storage.js';
@@ -21,6 +22,7 @@ const store = (() => {
 
 let state = storage.emptyState();
 let verdictShownFor = null;
+const followupWording = {};
 
 const persist = () => storage.save(store, state);
 
@@ -64,6 +66,48 @@ async function detectMode() {
 function renderBadge() {
   $('mode-badge').textContent = state.mode === 'live' ? 'Live' : 'Offline mode';
   $('mode-badge').dataset.mode = state.mode;
+  $('start-disclosure').textContent = LIVE_DISCLOSURE;
+  $('start-disclosure').hidden = state.mode !== 'live';
+}
+
+// ---------- Claude (live mode only) ----------
+
+const TIMEOUTS = { followup: 8000, flags: 8000, card: 30000 };
+
+// Returns the task result, or null after switching the session to offline mode.
+async function askClaude(task, payload) {
+  if (state.mode !== 'live') return null;
+  try {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ task, payload }),
+      signal: AbortSignal.timeout(TIMEOUTS[task]),
+    });
+    const body = await res.json();
+    if (res.ok && body.result) return body.result;
+  } catch {
+    // Network error, timeout or a body that is not JSON: same as any other failure.
+  }
+  goOffline();
+  return null;
+}
+
+function goOffline() {
+  if (state.mode === 'offline') return;
+  state.mode = 'offline';
+  persist();
+  renderBadge();
+  $('notice').textContent = OFFLINE_NOTICE;
+  $('notice').hidden = false;
+}
+
+async function wordFollowup(q) {
+  if (!followupWording[q.id]) {
+    const result = await askClaude('followup', { followupId: q.id });
+    if (result && checkFollowupText(result.question)) followupWording[q.id] = result.question;
+  }
+  if (followupWording[q.id] && state.step === q.id && !$('view-question').hidden) $('q-text').textContent = followupWording[q.id];
 }
 
 // ---------- start ----------
@@ -127,7 +171,8 @@ function renderQuestion() {
   $('q-progress').textContent = `${seq.indexOf(q.id) + 1} of ${seq.length}`;
   $('q-reason').hidden = !q.reason;
   $('q-reason').textContent = q.reason || '';
-  $('q-text').textContent = q.text;
+  $('q-text').textContent = followupWording[q.id] || q.text;
+  if (q.reason && state.mode === 'live') wordFollowup(q);
   $('q-hint').hidden = !q.hint;
   $('q-hint').textContent = q.hint || '';
 
@@ -173,18 +218,32 @@ function renderQuestion() {
   show('view-question');
 }
 
-function onNextClick() {
+async function onNextClick() {
   const q = getQuestion(state.step);
   if (q.freeText) {
     const text = $('q-free').value.trim();
     state.answers[q.id] = text;
+    // The fixed phrase check runs first and needs no model.
     if (hasEmergencyKeyword(text)) {
       state.flags.emergency = true;
       persist();
       showEmergency();
       return;
     }
-    if (asksForVerdict(text) && verdictShownFor !== text) {
+    let modelFlags = null;
+    if (text && state.mode === 'live' && verdictShownFor !== text) {
+      $('q-next').disabled = true;
+      modelFlags = await askClaude('flags', { text });
+      $('q-next').disabled = false;
+    }
+    const flags = combineFlags(text, modelFlags);
+    if (flags.emergency) {
+      state.flags.emergency = true;
+      persist();
+      showEmergency();
+      return;
+    }
+    if (flags.verdict_request && verdictShownFor !== text) {
       state.flags.verdict_request = true;
       verdictShownFor = text;
       persist();
@@ -230,7 +289,24 @@ function leaveEmergency() {
 // ---------- card ----------
 
 function finish() {
-  state.card = { ruleOutput: buildCard(state.answers), explanations: {}, wording: 'fixed', ticks: {} };
+  state.card = { ruleOutput: buildCard(state.answers), explanations: {}, wording: 'fixed', fallback: false, ticks: {} };
+  persist();
+  renderCard();
+  if (state.mode === 'live') writeCard();
+}
+
+// The card is shown at once with fixed wording; Claude's explanations replace it only if they pass the check.
+async function writeCard() {
+  const card = state.card;
+  $('card-status').textContent = WRITING_NOTE;
+  const result = await askClaude('card', { ruleOutput: card.ruleOutput });
+  if (state.card !== card) return;
+  if (result && checkCardText(card.ruleOutput, result)) {
+    card.explanations = Object.fromEntries(result.actions.map((a) => [a.id, a.explanation]));
+    card.wording = 'model';
+  } else {
+    card.fallback = true;
+  }
   persist();
   renderCard();
 }
@@ -246,6 +322,7 @@ function renderCard() {
     el('h1', {}, 'Your card'),
     el('p', { class: 'quiet' }, START.emergencyLine),
 
+    el('p', { class: 'note', id: 'card-status', role: 'status' }, state.card.fallback ? FIXED_WORDING_NOTE : ''),
     el('h2', {}, 'This week'),
     el('p', { class: 'note' }, ORDER_NOTE),
     el(
@@ -253,7 +330,7 @@ function renderCard() {
       { class: 'actions' },
       ruleOutput.actions.map((a) => {
         const def = ACTIONS[a.id];
-        const explanation = state.card.explanations[a.id] || def.explanation;
+        const explanation = (state.card.wording === 'model' && state.card.explanations[a.id]) || def.explanation;
         return el(
           'li',
           { 'data-action': a.id },
