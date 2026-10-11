@@ -4,12 +4,9 @@ import { getQuestion } from './lib/questions.js';
 import { questionSequence, buildCard, buildingFacts } from './lib/rules.js';
 import { hasEmergencyKeyword, combineFlags } from './lib/emergency.js';
 import { checkCardText, checkFollowupText } from './lib/validate.js';
-import {
-  ACTIONS, VARIANTS, WHY, ENGINEER, PROCESS, PROCESS_TITLE, PROCESS_SOURCE, FACTS, CANNOT_JUDGE, START, ORDER_NOTE,
-  HONEST_PANEL, EMERGENCY, LIVE_DISCLOSURE, WRITING_NOTE, OFFLINE_NOTICE, FIXED_WORDING_NOTE,
-} from './lib/content.js';
-import { SOURCES, APP_RULE, tagLabel } from './lib/sources.js';
+import { FACTS, START, HONEST_PANEL, EMERGENCY, LIVE_DISCLOSURE, WRITING_NOTE, OFFLINE_NOTICE } from './lib/content.js';
 import * as storage from './lib/storage.js';
+import { cardView } from './lib/cardview.js';
 
 // localStorage can throw on access (blocked site data); then nothing is kept.
 const store = (() => {
@@ -37,11 +34,16 @@ function el(tag, attrs = {}, ...children) {
     else if (key.startsWith('on')) node.addEventListener(key.slice(2), value);
     else if (value !== false && value != null) node.setAttribute(key, value === true ? '' : value);
   }
-  for (const child of children.flat()) {
+  for (const child of children.flat(Infinity)) {
     if (child == null || child === false) continue;
     node.append(child instanceof Node ? child : document.createTextNode(String(child)));
   }
   return node;
+}
+
+// replaceChildren with nested arrays flattened, so a list never turns into "[object ...]" text.
+function fill(node, ...children) {
+  node.replaceChildren(...children.flat(Infinity).filter((c) => c != null && c !== false));
 }
 
 function show(viewId) {
@@ -311,27 +313,25 @@ async function writeCard() {
   renderCard();
 }
 
-function tagLink(n) {
-  return el('a', { class: 'tag', href: `#source-${n}` }, tagLabel(n));
+function tagLink({ n, label }) {
+  return el('a', { class: 'tag', href: `#source-${n}` }, label);
 }
 
 function renderCard() {
-  const { ruleOutput } = state.card;
-  const card = $('card');
-  card.replaceChildren(
+  const v = cardView(state.card);
+  fill(
+    $('card'),
     el('h1', {}, 'Your card'),
-    el('p', { class: 'quiet' }, START.emergencyLine),
+    el('p', { class: 'quiet' }, v.emergencyLine),
 
-    el('p', { class: 'note', id: 'card-status', role: 'status' }, state.card.fallback ? FIXED_WORDING_NOTE : ''),
+    el('p', { class: 'note', id: 'card-status', role: 'status' }, v.status),
     el('h2', {}, 'This week'),
-    el('p', { class: 'note' }, ORDER_NOTE),
+    el('p', { class: 'note' }, v.orderNote),
     el(
       'ol',
       { class: 'actions' },
-      ruleOutput.actions.map((a) => {
-        const def = ACTIONS[a.id];
-        const explanation = (state.card.wording === 'model' && state.card.explanations[a.id]) || def.explanation;
-        return el(
+      v.actions.map((a) =>
+        el(
           'li',
           { 'data-action': a.id },
           el(
@@ -340,52 +340,43 @@ function renderCard() {
             el('input', {
               type: 'checkbox',
               'data-tick': a.id,
-              checked: state.card.ticks[a.id] === true,
+              checked: a.ticked,
               onchange: (e) => {
                 state.card.ticks[a.id] = e.target.checked;
                 persist();
               },
             }),
             ' ',
-            def.title,
+            a.title,
           ),
-          el('p', {}, explanation),
-          a.variants.map((v) => el('p', { class: 'variant', 'data-variant': v }, VARIANTS[v])),
-          a.why.map((w) => el('p', { class: 'why', 'data-why': w }, WHY[w], ' ', el('span', { class: 'tag' }, `[${APP_RULE}]`))),
-          el('p', { class: 'source' }, tagLink(def.source)),
-        );
-      }),
+          el('p', {}, a.explanation),
+          a.variants.map((x) => el('p', { class: 'variant', 'data-variant': x.id }, x.text)),
+          a.why.map((x) => el('p', { class: 'why', 'data-why': x.id }, x.text, ' ', el('span', { class: 'tag' }, v.appRule))),
+          el('p', { class: 'source' }, tagLink(a.source)),
+        ),
+      ),
     ),
 
     el('h2', {}, 'Questions for an engineer'),
-    el(
-      'ul',
-      { class: 'engineer' },
-      ruleOutput.engineer.map((id) => el('li', { 'data-engineer': id }, ENGINEER[id])),
-    ),
-    ruleOutput.process.length
-      ? [
-          el('h3', {}, PROCESS_TITLE),
-          ruleOutput.process.map((id) =>
-            el('p', { class: 'process', 'data-process': id }, PROCESS[id], PROCESS_SOURCE[id] ? [' ', tagLink(PROCESS_SOURCE[id])] : null),
-          ),
-        ]
-      : null,
+    el('ul', { class: 'engineer' }, v.engineer.map((q) => el('li', { 'data-engineer': q.id }, q.text))),
+    v.process && [
+      el('h3', {}, v.process.title),
+      v.process.items.map((p) => el('p', { class: 'process', 'data-process': p.id }, p.text, p.source && [' ', tagLink(p.source)])),
+    ],
 
     el('h2', {}, 'What this app cannot judge'),
-    el('ul', { class: 'cannot' }, CANNOT_JUDGE.map((t) => el('li', {}, t))),
+    el('ul', { class: 'cannot' }, v.cannotJudge.map((t) => el('li', {}, t))),
 
     el('h2', { class: 'sources-title' }, 'Sources'),
     el(
       'ol',
       { class: 'sources' },
-      SOURCES.map((s) =>
-        el('li', { id: `source-${s.n}`, value: s.n }, `${s.org}, ${s.title}. `, el('a', { href: s.url, rel: 'noopener' }, s.url), `. Checked ${s.checked}.`),
-      ),
+      v.sources.map((s) => el('li', { id: `source-${s.n}`, value: s.n }, s.text, el('a', { href: s.url, rel: 'noopener' }, s.url), s.checked)),
     ),
-    el('p', { class: 'note' }, `${APP_RULE}: the order and the "because you said" lines come from this app's own logic, not from an official source.`),
+    el('p', { class: 'note' }, v.appRuleNote),
   );
-  $('card-buttons').replaceChildren(
+  fill(
+    $('card-buttons'),
     el('button', { type: 'button', class: 'primary', id: 'card-print', onclick: () => window.print() }, 'Print'),
     el('button', { type: 'button', id: 'card-start-over', onclick: startOver }, 'Start over'),
     el('button', { type: 'button', id: 'card-clear', onclick: clearAnswers }, 'Clear my answers'),

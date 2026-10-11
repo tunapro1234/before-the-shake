@@ -76,6 +76,9 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
 
 ## Final Review
 
+- [ ] Fix: official-process block renders as text, not "[object ...]" (commit "Fix card process block and fit print on one page"; confirm on laptop run 2)
+- [ ] Fix: card B prints on one A4 page with every line kept (commit "Fix card process block and fit print on one page"; confirm on laptop run 2)
+- [x] Fix: README names the survey source and says the app is not tested with users yet (same commit)
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
@@ -98,3 +101,4 @@ Activity mode:
 - Checkpoint 1 feedback (learner, via main), folded into slice 4: progress is "N of M" with M from `questionSequence`; the Law 6306 and renter lines move under "The official process" below the engineer questions (`buildCard` returns `process`); the Honest Panel shows facts as plain sentences; the Emergency back button reads "Back to the questions"; the A5 helper and neighbour lines merge into one sentence (`who_helps_neighbour`); print uses a smaller base size and small-type sources. `prd.md` and `spec.md` updated to match.
 - Fonts: only three files are bundled (Source Serif 4 Semibold for headings, Source Sans 3 Regular and Semibold for body), from releases `4.005R` and `3.052R`. The release zips carry no license file, so each `OFL.txt` is the `LICENSE.md` from the same release tag in Adobe's repository.
 - Slice 5 findings: the pinned SDK `0.128.0` types confirm `output_config: { effort, format: { type: "json_schema", schema } }`, so no tool fallback was needed. C2 cannot be checked without a key, so the fast tasks send `effort: "low"` and, if the API answers 400 naming effort, retry once without it and keep it off (tested with a stub); the first live run will show which path Haiku takes. The `followup` task takes only `followupId` and reads the fixed question from `questions.js` on the server, and the `card` task rebuilds titles and lines from `content.js`, so no text from the browser goes into a prompt except the free-text note sent to `flags`. The server runs the same checks as the browser (`validate.js`, plus `checkFlags`), and the page checks the card again before showing it. Live mode shows the fixed card at once and swaps in Claude's explanations only when they pass.
+- Final review, laptop run 1 (39 ok, 7 fail): the official-process block rendered as "[object ...]" text because `replaceChildren` got a nested array; the card is now built from a pure `lib/cardview.js` (tested in `test/cardview.test.js`) and every child list is flattened before it reaches the DOM. Card B printed on two pages; the print stylesheet now uses smaller type, tighter spacing and a two-column sources list, with every line kept. The phone-number check in the laptop script now allows the law numbers 6306 and 7471. README names the survey source and says the app is not tested with users yet.

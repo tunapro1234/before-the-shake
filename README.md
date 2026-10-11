@@ -10,7 +10,7 @@ Before the Shake asks them about ten short questions, one per screen, and gives 
 
 A household with a small child and a parent who needs help on the stairs gets a different order than two adults in a ground-floor flat. Each change says why ("Because you said ...").
 
-An Istanbul Statistics Office survey from November 2020 (769 people, [reported by bianet](https://bianet.org/haber/istanbullularin-yuzde-72-sinin-deprem-cantasi-yok-234374)) found that 72.1% had no emergency bag and 52.6% did not know their assembly area. The card starts there.
+A survey by the Istanbul Metropolitan Municipality's statistics office (November 2020, 769 people, [reported by bianet](https://bianet.org/haber/istanbullularin-yuzde-72-sinin-deprem-cantasi-yok-234374)) found that 72.1% had no emergency bag and 52.6% did not know their assembly area. The card starts there. We have not tested the app with users yet.
 
 ## What it does not do
 
