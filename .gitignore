@@ -6,3 +6,4 @@
 /.agents/
 node_modules/
 dist/
+/agent/
