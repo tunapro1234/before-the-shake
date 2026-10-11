@@ -210,9 +210,9 @@ Mapping confirmed by the learner in review. ECA page titles in the HTML are gene
 | 6 | Law No. 6306 on the Transformation of Areas under Disaster Risk, Article 3(1), as amended by Law 7471 (7 Nov 2023) | https://www.mevzuat.gov.tr/MevzuatMetin/1.5.6306.pdf | Own-flat engineer line |
 | — | App rule | (no link) | every "why" line and the order |
 
-Law 6306 card line (learner-checked against the law text): "Under Turkey's Law 6306, building owners can have a risky-building assessment done, at their own cost, by an institution licensed by the Urban Transformation Presidency."
+Law 6306 card line (checked against the law text): "Under Turkey's Law 6306, building owners can have a risky-building assessment done, at their own cost, by an institution licensed by the Urban Transformation Presidency."
 
-Check dates (2026-10-11): sources 1, 2, 3, 5 returned 200 from the dev server; source 4 checked by the learner (200, title "Afet ve Acil Durum Toplanma Alani Sorgulama"); source 6 read by the learner (article 3(1)). Re-check during the build only if a page changes.
+Check dates (2026-10-11): sources 1, 2, 3, 5 returned 200 from the dev server; source 4 checked (200, title "Afet ve Acil Durum Toplanma Alani Sorgulama"); source 6 read (article 3(1)). Re-check during the build only if a page changes.
 - A6's fixed text carries, in the app's own words, ECA step 2's point: know where the gas, water and electricity shut-offs are, and turn off the gas only if you smell or hear a leak.
 
 ## Important Failure Modes

@@ -152,7 +152,7 @@ Source: `scope.md > The Unique Kernel` ("each with a source tag").
 - The sources list shows organization, page title, URL and the date the team checked it.
 - Order explanations ("why: because you said ...") carry the tag "App rule": the app's own logic, not an official source.
 - All wording is the team's own sentences; no copied official text.
-- Candidate sources (checked by the learner on 2026-10-11): earthquakecountry.org/sevensteps (and steps 1-3), shakeout.org/dropcoverholdon, the AFAD services page on turkiye.gov.tr (assembly-area lookup listed there; needs e-Devlet login), Law 6306 on mevzuat.gov.tr, afad.gov.tr. The final list is fixed in `4-spec`.
+- Candidate sources (checked on 2026-10-11): earthquakecountry.org/sevensteps (and steps 1-3), shakeout.org/dropcoverholdon, the AFAD services page on turkiye.gov.tr (assembly-area lookup listed there; needs e-Devlet login), Law 6306 on mevzuat.gov.tr, afad.gov.tr. The final list is fixed in `4-spec`.
   - [ ] Every action shows a numbered tag that leads to an entry in the sources list.
   - [ ] Every sources-list entry shows organization, page title, URL and check date.
   - [ ] Every order change is tagged "App rule".
