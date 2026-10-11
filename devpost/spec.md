@@ -21,7 +21,7 @@ Why this shape: the rules are the product, so they live in one testable file tha
 ## The Core Journey Through the System
 PRD ref: `prd.md > The Core Journey`.
 
-1. You run `npm start` and open `http://localhost:3000`. The page asks the server `GET /api/mode`; the server answers `live` if `ANTHROPIC_API_KEY` is set, else `offline`. If the request fails (no server, as in the static demo), the page uses `offline`. The Start screen shows the badge.
+1. You run `npm start` and open `http://localhost:3000`. The page asks the server `GET /api/mode`; the server answers `live` if `ANTHROPIC_API_KEY` is set, else `offline`. If the request fails (no server, as in the static demo), the page uses `offline`. The badge (`#mode-badge`, top of the page) shows on every view except Emergency; the Honest Panel overlay carries its own copy (`#panel-badge`); print hides both.
 2. You press Start. The page reads the question list from `questions.js` and shows Q1. Each chip tap is saved to `localStorage` right away.
 3. When a follow-up's condition is met (`rules.js > followupsFor(answers)`), the page shows it. In live mode it first asks `/api/claude` with task `followup` (fast model) for a friendlier wording of the question; the "Because you said ..." line and the chips are fixed. If the call fails or the wording fails its check, the fixed wording is used.
 4. "Can you tell me if my building is safe?" opens the Honest Panel (fixed text from `content.js`), which lists the building facts given so far as plain sentences (`FACTS` in `content.js`). Closing it returns to the same question.

@@ -24,7 +24,7 @@ Success: one person finishes in a few minutes and gets a card whose order fits t
 It is a one-off rather than a daily habit; they might come back after a move or a change in the household.
 
 ## Screens and Layout
-Single column that works on a phone. Five surfaces:
+Single column that works on a phone. Five surfaces. The small "Live" / "Offline mode" badge sits at the top of every surface except Emergency, which shows only 112; it is not printed.
 
 ### Start Screen
 - One sentence on what the app is and what it is not.
@@ -196,7 +196,7 @@ Source: `scope.md > What "Working" Looks Like`.
 - Live mode: Claude writes follow-up wording, reads the free text into flags and writes the card.
 - Offline mode, when there is no API key: the same flow and the same order, with fixed wording. A visible "Offline mode" label.
 - If the API fails mid-way, the app switches to offline mode with a visible notice and keeps the answers.
-  - [ ] With no API key, the whole flow runs and the badge says "Offline mode".
+  - [ ] With no API key, the whole flow runs and the badge says "Offline mode" on the Start, Question, Honest Panel and Card views, and is absent on Emergency and in print.
   - [ ] Simulating an API failure mid-interview shows a notice, keeps earlier answers and continues offline.
 
 ## States and Boundaries

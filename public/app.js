@@ -49,6 +49,8 @@ function fill(node, ...children) {
 function show(viewId) {
   $('panel').hidden = true;
   for (const view of document.querySelectorAll('.view')) view.hidden = view.id !== viewId;
+  // The badge is on every view except Emergency, which shows only 112.
+  $('mode-badge').hidden = viewId === 'view-emergency';
   window.scrollTo(0, 0);
 }
 
@@ -66,8 +68,10 @@ async function detectMode() {
 }
 
 function renderBadge() {
-  $('mode-badge').textContent = state.mode === 'live' ? 'Live' : 'Offline mode';
-  $('mode-badge').dataset.mode = state.mode;
+  for (const badge of [$('mode-badge'), $('panel-badge')]) {
+    badge.textContent = state.mode === 'live' ? 'Live' : 'Offline mode';
+    badge.dataset.mode = state.mode;
+  }
   $('start-disclosure').textContent = LIVE_DISCLOSURE;
   $('start-disclosure').hidden = state.mode !== 'live';
 }

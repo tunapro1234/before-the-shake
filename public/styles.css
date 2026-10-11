@@ -54,6 +54,8 @@ a { color: var(--accent); }
 .reason { margin-bottom: 0; }
 .badge { display: inline-block; margin: 0; border: 1px solid var(--rule); padding: 2px 10px; font-size: 0.8rem; color: var(--muted); }
 .badge[data-mode="live"] { border-color: var(--accent); color: var(--accent); }
+.badge[hidden] { display: none; }
+#mode-badge { margin-bottom: 8px; }
 
 /* Controls */
 button { font: inherit; min-height: 48px; padding: 8px 18px; border: 1px solid var(--rule); border-radius: 2px; background: #fff; color: var(--ink); cursor: pointer; }
