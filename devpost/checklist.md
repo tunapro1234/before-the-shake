@@ -59,7 +59,7 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
   Learner check: Later, with your own key: run in live mode and read the card explanations; then set a wrong model name in `.env` and watch the fixed-wording fallback.
   Commit: `Add live mode with checked Claude output`
 
-- [ ] **6. Someone else can run it**
+- [x] **6. Someone else can run it**
   Becomes usable: A stranger can clone, read the README (what it is, what it is not, run steps, both modes, how to run live, sources, the live-mode sentence) and start it; `.env.example`; MIT `LICENSE`.
   Why now: Needed for the public repo and the video; written last so it describes what exists.
   PRD ref: `prd.md > What We're Building`
