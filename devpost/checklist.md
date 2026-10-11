@@ -19,7 +19,7 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
   Learner check: Start the app, answer every question, and look at the card: are the three sections and their wording what you pictured?
   Commit: `Add offline interview and base card`
 
-- [ ] **2. Your household changes the card**
+- [x] **2. Your household changes the card**
   Becomes usable: F1-F3 follow-ups appear only under their conditions with "Because you said ..."; the child, older-person and pet modifiers change order and contents with "why" lines tagged "App rule"; building facts produce engineer questions (and general ones when none) without touching actions or order; the Law 6306 owner line.
   Why now: This is the kernel (an order for your household, facts turned into engineer questions), so it comes right after the skeleton.
   PRD ref: `prd.md > Interview`, `prd.md > Priority Rules`, `prd.md > Honest Redirect`

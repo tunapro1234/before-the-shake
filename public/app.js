@@ -2,7 +2,7 @@
 
 import { getQuestion } from './lib/questions.js';
 import { questionSequence, buildCard } from './lib/rules.js';
-import { ACTIONS, VARIANTS, ENGINEER, ENGINEER_SOURCE, CANNOT_JUDGE, START, ORDER_NOTE } from './lib/content.js';
+import { ACTIONS, VARIANTS, WHY, ENGINEER, ENGINEER_SOURCE, CANNOT_JUDGE, START, ORDER_NOTE } from './lib/content.js';
 import { SOURCES, APP_RULE, tagLabel } from './lib/sources.js';
 
 const state = {
@@ -194,8 +194,8 @@ function renderCard() {
           { 'data-action': a.id },
           el('label', { class: 'action-title' }, el('input', { type: 'checkbox', 'data-tick': a.id }), ' ', def.title),
           el('p', {}, explanation),
-          a.variants.map((v) => el('p', { class: 'variant' }, VARIANTS[v])),
-          a.why.map((w) => el('p', { class: 'why' }, w, ' ', el('span', { class: 'tag' }, `[${APP_RULE}]`))),
+          a.variants.map((v) => el('p', { class: 'variant', 'data-variant': v }, VARIANTS[v])),
+          a.why.map((w) => el('p', { class: 'why', 'data-why': w }, WHY[w], ' ', el('span', { class: 'tag' }, `[${APP_RULE}]`))),
           el('p', { class: 'source' }, tagLink(def.source)),
         );
       }),
