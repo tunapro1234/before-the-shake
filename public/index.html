@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Before the Shake</title>
+  <meta name="description" content="A short, calm earthquake-preparedness interview for people in Istanbul apartments that ends in one honest card.">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main id="app">
+    <section id="view-start" class="view" hidden>
+      <p class="badge" id="mode-badge"></p>
+      <h1 id="start-title"></h1>
+      <p class="lead" id="start-lead"></p>
+      <p id="start-not"></p>
+      <button type="button" class="primary" id="start-button">Start</button>
+      <p class="quiet" id="start-emergency"></p>
+    </section>
+
+    <section id="view-question" class="view" hidden>
+      <p class="progress" id="q-progress"></p>
+      <p class="reason" id="q-reason" hidden></p>
+      <h2 id="q-text"></h2>
+      <p class="hint" id="q-hint" hidden></p>
+      <div class="chips" id="q-chips"></div>
+      <textarea id="q-free" rows="4" hidden aria-labelledby="q-text"></textarea>
+      <div class="nav">
+        <button type="button" id="q-back">Back</button>
+        <button type="button" class="primary" id="q-next" hidden>Next</button>
+      </div>
+    </section>
+
+    <section id="view-card" class="view" hidden>
+      <article class="card" id="card"></article>
+      <div class="card-buttons" id="card-buttons"></div>
+    </section>
+  </main>
+</body>
+</html>

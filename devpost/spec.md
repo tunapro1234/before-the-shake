@@ -46,7 +46,7 @@ Learner-accepted (4-spec, group 1):
 - **Node.js 22** (installed on the dev machine: v22.22.0). Runs the local server. https://nodejs.org/docs/latest-v22.x/api/
 - **Built-in `node:http`**, no web framework — one route plus static files does not need Express.
 - **Plain browser JavaScript (ES modules), no build step** — open the files, no bundler to debug.
-- **`@anthropic-ai/sdk`**, the only runtime dependency, pinned to an exact version in `package.json` (no `^`). Latest on npm on 2026-10-11: `0.133.0`; confirm at install. https://github.com/anthropics/anthropic-sdk-typescript · https://docs.claude.com/en/api/messages
+- **`@anthropic-ai/sdk`**, the only runtime dependency, pinned to an exact version in `package.json` (no `^`). Pinned to `0.128.0`, the newest version at least two weeks on npm at install (2026-10-11). https://github.com/anthropics/anthropic-sdk-typescript · https://docs.claude.com/en/api/messages
 - **`node:test`** and `node:assert` for unit tests, no test framework. https://nodejs.org/docs/latest-v22.x/api/test.html
 - **No other dependencies.** Structured JSON output uses the API's `output_config.format` with a plain JSON schema, so no schema library is added.
 

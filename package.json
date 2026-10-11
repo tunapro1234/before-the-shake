@@ -1,0 +1,18 @@
+{
+  "name": "before-the-shake",
+  "version": "0.1.0",
+  "description": "A short, calm earthquake-preparedness interview for people in Istanbul apartments that ends in one honest card.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.128.0"
+  }
+}
