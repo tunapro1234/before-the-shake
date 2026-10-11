@@ -45,7 +45,7 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
   PRD ref: `prd.md > Card`, `prd.md > States and Boundaries`, `prd.md > Look and Feel`
   Spec ref: `spec.md > Data Model`, `spec.md > Look and Feel`
   Build: `localStorage` load/save, ticks, resume, Start over, Clear; `styles.css` with tokens, fonts from Adobe's GitHub releases with `OFL.txt`, print stylesheet.
-  Verify (mechanical): `npm test`; headless run: tick, reload, tick still there; reload mid-interview resumes; Clear empties `localStorage`; print-to-PDF on A4 is one page with nothing cut off; screenshots at phone and desktop width.
+  Verify (mechanical): `nice -n 19 npm test` incl. `test/storage.test.js` (save/load with a fake storage: ticks kept, step resumes, Start over keeps nothing but mode, Clear removes the key, broken JSON starts fresh); `curl` the font files and `OFL.txt`. Browser checks (tick survives reload, resume mid-interview, print-to-PDF one A4 page, phone and desktop screenshots) move to the final checkpoint run on the laptop.
   Learner check: Tick two actions, close the tab, reopen it, and print the card. Does it look like a note you would stick on the fridge?
   Commit: `Add saved card, print and visual style`
 
@@ -72,7 +72,7 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
 ## Hands-on Checkpoints
 
 - [ ] Early usable behavior explored — after slice 3: the four scope proofs in offline mode (two households, honest redirect, 112 stop, offline label)
-- [ ] Final kick-the-tires exploration and feedback completed
+- [ ] Final kick-the-tires exploration and feedback completed — after slice 6; the browser run (slice 4 checks plus a slice 1-3 regression) goes to the laptop via main
 
 ## Final Review
 
@@ -94,3 +94,4 @@ Activity mode:
 
 - `@anthropic-ai/sdk` pinned to `0.128.0`, not `0.133.0` — the build rule asks for a version at least two weeks on npm; `0.128.0` (2026-09-22) is the newest that qualifies.
 - Added a fixed offline check, `asksForVerdict` in `lib/emergency.js`, so free text asking for a verdict ("Is my building safe?") opens the Honest Panel in offline mode too, as `prd.md` asks. It opens once per text; submitting the same text again makes the card. Live mode adds the model's flag on top.
+- Server overheating (2026-10-11): no headless browser run per slice from slice 4 on. Each slice is verified with `nice -n 19 npm test`; browser checks run only at the two hands-on checkpoints, on the laptop. Slice 4 storage logic goes in a pure `lib/storage.js` so it can be unit-tested.
