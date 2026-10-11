@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before the Shake: App Map</title>
+<style>
+  :root { --paper: #faf7f0; --ink: #1e1e1c; --muted: #5a5852; --rule: #d9d3c7; --accent: #1f5f5b; --box: #fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #1c1c1a; --ink: #ecebe6; --muted: #a9a69d; --rule: #3c3a35; --accent: #7fc2bb; --box: #262624; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.55 Georgia, serif; }
+  main { max-width: 46rem; margin: 0 auto; padding: 24px 16px 48px; }
+  h1, h2 { line-height: 1.25; }
+  h1 { font-size: 1.8rem; margin-bottom: 0.2em; }
+  h2 { font-size: 1.25rem; margin-top: 1.8em; border-top: 1px solid var(--rule); padding-top: 0.8em; }
+  p, li { font-family: system-ui, sans-serif; }
+  .muted { color: var(--muted); font-size: 0.9rem; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; background: var(--box); border: 1px solid var(--rule); padding: 0 4px; overflow-wrap: anywhere; }
+  ol.route > li { margin-bottom: 14px; }
+  .box { background: var(--box); border: 1px solid var(--rule); padding: 12px 14px; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { font-family: system-ui, sans-serif; font-size: 13px; fill: var(--ink); }
+  svg .node { fill: var(--box); stroke: var(--accent); stroke-width: 1.5; }
+  svg .fall { fill: var(--box); stroke: var(--muted); stroke-dasharray: 4 3; }
+  svg .line { stroke: var(--accent); stroke-width: 1.5; fill: none; }
+  svg .dash { stroke: var(--muted); stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; }
+  svg .small { font-size: 11px; fill: var(--muted); }
+  details { margin: 8px 0; }
+  summary { cursor: pointer; font-family: system-ui, sans-serif; }
+  table { border-collapse: collapse; width: 100%; font-family: system-ui, sans-serif; font-size: 0.92rem; }
+  td { border-top: 1px solid var(--rule); padding: 6px 8px 6px 0; vertical-align: top; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Before the Shake: App Map</h1>
+  <p class="muted">A take-home guide to the code. Snapshot of source commit <code>d6e4ab4</code>; the code can drift after this.</p>
+
+  <h2>What the app is</h2>
+  <p>A calm interview about a household in an Istanbul flat that ends in one printable card: what to do this week, questions for an engineer, and what the app cannot judge. Four pieces do the work:</p>
+  <ul>
+    <li><strong>Rules</strong> (<code>public/lib/rules.js</code>) decide which actions go on the card and in what order. No model is involved.</li>
+    <li><strong>Fixed text</strong> (<code>public/lib/content.js</code>, <code>questions.js</code>, <code>sources.js</code>) is everything offline mode shows.</li>
+    <li><strong>The fence</strong> (<code>public/lib/validate.js</code>, <code>public/lib/emergency.js</code>) decides what Claude's wording may change, and stops the flow for an emergency without asking the model.</li>
+    <li><strong>Live mode</strong> (<code>server/claude.js</code>, <code>server/prompts.js</code>) asks Claude for wording only, through the local server.</li>
+  </ul>
+
+  <h2>One action: "Make my card" in live mode</h2>
+  <svg viewBox="0 0 680 260" role="img" aria-labelledby="dtitle">
+    <title id="dtitle">Make my card: the browser shows the fixed card, asks the server, the server asks Claude and checks the answer; the browser checks again and either swaps in Claude's explanations or keeps the fixed wording.</title>
+    <rect class="node" x="10" y="20" width="190" height="64" rx="3"/>
+    <text x="22" y="44">app.js: finish()</text>
+    <text class="small" x="22" y="64">fixed card shown at once</text>
+    <rect class="node" x="245" y="20" width="190" height="64" rx="3"/>
+    <text x="257" y="44">server/claude.js: card</text>
+    <text class="small" x="257" y="64">schema with the card's ids</text>
+    <rect class="node" x="480" y="20" width="190" height="64" rx="3"/>
+    <text x="492" y="44">validate.js</text>
+    <text class="small" x="492" y="64">checkCardText</text>
+    <path class="line" d="M200 52 H245"/><path class="line" d="M435 52 H480"/>
+    <rect class="node" x="245" y="170" width="190" height="64" rx="3"/>
+    <text x="257" y="194">app.js: writeCard()</text>
+    <text class="small" x="257" y="214">checks again, then renders</text>
+    <path class="line" d="M575 84 V202 H435"/>
+    <text class="small" x="582" y="140">pass: Claude's words</text>
+    <rect class="fall" x="10" y="170" width="190" height="64" rx="3"/>
+    <text x="22" y="194">Fixed wording</text>
+    <text class="small" x="22" y="214">any failure, plus offline notice</text>
+    <path class="dash" d="M245 202 H200"/>
+  </svg>
+
+  <h3>Reference route (3 stops)</h3>
+  <p class="muted">A reference route through the finished code, not a record of a completed tour.</p>
+  <ol class="route">
+    <li><strong><code>public/app.js</code>, search <code>async function writeCard</code> and <code>async function askClaude</code>.</strong>
+      The card appears straight away with the fixed explanations. <code>askClaude</code> sends only the rule output to <code>/api/claude</code>, with a 30 second timeout. Any network error, timeout or error reply calls <code>goOffline()</code>: the badge changes, the notice appears, and the answers stay.</li>
+    <li><strong><code>server/claude.js</code>, search <code>card: (</code>.</strong>
+      The server refuses a card with any action, household or why id the app does not know before calling Claude, then builds the prompt input from the app's own titles and lines (<code>ACTIONS</code>, <code>VARIANTS</code>, <code>WHY</code>), not from raw answers. The JSON schema from <code>cardSchema(ids)</code> in <code>server/prompts.js</code> limits ids to the card's own. A <code>stop_reason</code> other than <code>end_turn</code>, text that does not parse, or a failed check all return <code>{ error }</code>.</li>
+    <li><strong><code>public/lib/validate.js</code>, search <code>export function checkCardText</code>.</strong>
+      The fence itself: the id list must equal the rule output exactly and in order, each explanation is 1 to 240 characters, and digits, <code>%</code> and phrases such as "building is safe" are refused. Titles, order, sources and engineer questions never come from the model, so passing this check is enough.</li>
+  </ol>
+  <details>
+    <summary>The same idea for the emergency stop</summary>
+    <p><code>public/lib/emergency.js</code>, <code>hasEmergencyKeyword</code> runs in the browser before any model call. <code>combineFlags</code> joins it with the model's flags using OR, so the model can add an emergency but never clear one. <code>test/claude.test.js</code> has the case where the stub says "no emergency" for "I smell gas" and <code>combineFlags</code> still returns an emergency, so the 112 screen opens.</p>
+  </details>
+
+  <h2>To change this, start here</h2>
+  <table>
+    <tr><td>Add an action or change when it appears</td><td><code>public/lib/rules.js</code> <code>ON_CARD</code>, its text in <code>public/lib/content.js</code> <code>ACTIONS</code>, a test in <code>test/rules.test.js</code></td></tr>
+    <tr><td>Change the order rules</td><td><code>public/lib/rules.js</code> <code>orderActions</code></td></tr>
+    <tr><td>Refuse another phrase in Claude's wording</td><td><code>public/lib/validate.js</code> <code>BLOCKED</code>, a case in <code>test/validate.test.js</code></td></tr>
+    <tr><td>Catch another emergency phrase</td><td><code>public/lib/emergency.js</code> <code>EMERGENCY_PHRASES</code>, positive and negative cases in <code>test/emergency.test.js</code></td></tr>
+    <tr><td>What the card shows, line by line</td><td><code>public/lib/cardview.js</code> <code>cardView</code>; <code>renderCard</code> in <code>public/app.js</code> only draws it</td></tr>
+    <tr><td>Prompts or models</td><td><code>server/prompts.js</code>; models in <code>.env</code> as <code>CLAUDE_MODEL_FAST</code> and <code>CLAUDE_MODEL_CARD</code></td></tr>
+    <tr><td>The printed card</td><td><code>public/styles.css</code>, the <code>@media print</code> block</td></tr>
+  </table>
+
+  <h2>A practice to reuse</h2>
+  <div class="box">
+    <p><strong>Let the model write only into slots the app owns, then check the slots and test every way it can fail.</strong> Here the rules choose the action ids; Claude may only fill in an explanation per id; <code>checkCardText</code> compares ids, not reworded text, and four failure forms (API error, refusal or <code>max_tokens</code>, unparseable text, JSON that fails the check) all land on the same fixed wording. <code>test/claude.test.js</code> drives each form through a stubbed SDK client, so it runs without a key.</p>
+    <p>One limit showed up in the build: data-level tests passed while the page printed "[object HTMLHeadingElement]" for the official-process block. The browser run caught it (final review, laptop run 1). Since then <code>cardView</code> keeps the card as plain data that a test can read, and the browser run checks what a person actually sees. On another project the same pair applies: a test on the data the model is allowed to touch, and one check on the screen people read.</p>
+    <p>Still open: with no API key on the build server, the real model has not run yet. Whether the fast model accepts <code>effort: "low"</code> (spec change C2) is shown by the first live run; <code>server/claude.js</code> retries once without it if the API refuses. The check also reads words, not meaning: a reassuring sentence with no number and no blocked phrase would pass. The emergency phrases are English only.</p>
+  </div>
+
+  <h2>Run it again</h2>
+  <p><code>npm ci</code>, then <code>npm start</code>, then open <code>http://localhost:3000</code>. Without a key it runs in offline mode. For live mode, copy <code>.env.example</code> to <code>.env</code> and set <code>ANTHROPIC_API_KEY</code>. Tests: <code>npm test</code>.</p>
+</main>
+</body>
+</html>

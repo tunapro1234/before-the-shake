@@ -72,26 +72,26 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 3: the four scope proofs in offline mode (two households, honest redirect, 112 stop, offline label)
-- [ ] Final kick-the-tires exploration and feedback completed — after slice 6; the browser run (slice 4 checks plus a slice 1-3 regression) goes to the laptop via main
+- [x] Final kick-the-tires exploration and feedback completed — after slice 6; the browser run (slice 4 checks plus a slice 1-3 regression) goes to the laptop via main. Laptop run 1 found 7 failures; after the fixes, laptop run 2 passed 49/49 and the learner's review (via main) passed.
 
 ## Final Review
 
-- [ ] Fix: official-process block renders as text, not "[object ...]" (commit "Fix card process block and fit print on one page"; confirm on laptop run 2)
-- [ ] Fix: card B prints on one A4 page with every line kept (commit "Fix card process block and fit print on one page"; confirm on laptop run 2)
+- [x] Fix: official-process block renders as text, not "[object ...]" (commit "Fix card process block and fit print on one page"; confirmed on laptop run 2)
+- [x] Fix: card B prints on one A4 page with every line kept (commit "Fix card process block and fit print on one page"; confirmed on laptop run 2)
 - [x] Fix: README names the survey source and says the app is not tested with users yet (same commit)
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Final review complete — feedback resolved and learner confirms ready to ship (main: "Final review passed")
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence:
-Route and stops:
-Edit outcome:
-Reflection:
-Activity mode:
+Activity and evidence: focused alternative on the learning goal (keeping an LLM inside hard safety boundaries while it is still useful). Evidence: `checkCardText` in `public/lib/validate.js`, the four failure forms driven through a stub client in `test/claude.test.js`, and the "[object ...]" bug that passed every data test and was caught only by laptop run 1. The learner named what the evidence does not establish: real model behaviour (fallback rate, latency, effort on the fast model), that the check reads words and not meaning, that the emergency check knows only English phrases, and that nobody outside the build has used it yet.
+Route and stops: not toured interactively; the map holds a reference route ("Make my card": `public/app.js` writeCard/askClaude, `server/claude.js` card, `public/lib/validate.js` checkCardText).
+Edit outcome: not applicable (focused alternative, no edit).
+Reflection: transfer question offered, skipped.
+Activity mode: focused alternative, answered by the learner through main. App map: `devpost/app-map.html` (paths and symbols checked against the code; browser look-over goes with the 6-ship laptop run).
 
 ## Revisions
 
@@ -102,3 +102,5 @@ Activity mode:
 - Fonts: only three files are bundled (Source Serif 4 Semibold for headings, Source Sans 3 Regular and Semibold for body), from releases `4.005R` and `3.052R`. The release zips carry no license file, so each `OFL.txt` is the `LICENSE.md` from the same release tag in Adobe's repository.
 - Slice 5 findings: the pinned SDK `0.128.0` types confirm `output_config: { effort, format: { type: "json_schema", schema } }`, so no tool fallback was needed. C2 cannot be checked without a key, so the fast tasks send `effort: "low"` and, if the API answers 400 naming effort, retry once without it and keep it off (tested with a stub); the first live run will show which path Haiku takes. The `followup` task takes only `followupId` and reads the fixed question from `questions.js` on the server, and the `card` task rebuilds titles and lines from `content.js`, so no text from the browser goes into a prompt except the free-text note sent to `flags`. The server runs the same checks as the browser (`validate.js`, plus `checkFlags`), and the page checks the card again before showing it. Live mode shows the fixed card at once and swaps in Claude's explanations only when they pass.
 - Final review, laptop run 1 (39 ok, 7 fail): the official-process block rendered as "[object ...]" text because `replaceChildren` got a nested array; the card is now built from a pure `lib/cardview.js` (tested in `test/cardview.test.js`) and every child list is flattened before it reaches the DOM. Card B printed on two pages; the print stylesheet now uses smaller type, tighter spacing and a two-column sources list, with every line kept. The phone-number check in the laptop script now allows the law numbers 6306 and 7471. README names the survey source and says the app is not tested with users yet.
+- Final review, laptop run 2 (49 ok, exit 0): the process block renders as text, card B prints on one A4 page, fonts load, no console errors. The page then had about a fifth of its height free, so the print sizes went back up (9.5pt body, 7.5pt small lines, 7pt sources; commit "Raise print type sizes to use the A4 page"). The laptop script keeps its one-page check, and the next laptop run re-checks it together with any 6-ship changes.
+- Learning wrap-up raised two gaps, planned for 6-ship and not built yet: the wording check reads words, not meaning, so reassurance phrases (hold up, should be fine, sturdy, solid, nothing to worry) join the blocked list with tests; the emergency check knows only English, so a few Turkish emergency phrases are matched after folding Turkish letters to ASCII (letters written as \u escapes so repo files stay ASCII), with tests.
