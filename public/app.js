@@ -4,18 +4,25 @@ import { getQuestion } from './lib/questions.js';
 import { questionSequence, buildCard, buildingFacts } from './lib/rules.js';
 import { hasEmergencyKeyword, asksForVerdict } from './lib/emergency.js';
 import {
-  ACTIONS, VARIANTS, WHY, ENGINEER, ENGINEER_SOURCE, CANNOT_JUDGE, START, ORDER_NOTE, HONEST_PANEL, EMERGENCY,
+  ACTIONS, VARIANTS, WHY, ENGINEER, PROCESS, PROCESS_TITLE, PROCESS_SOURCE, FACTS, CANNOT_JUDGE, START, ORDER_NOTE,
+  HONEST_PANEL, EMERGENCY,
 } from './lib/content.js';
 import { SOURCES, APP_RULE, tagLabel } from './lib/sources.js';
+import * as storage from './lib/storage.js';
 
-const state = {
-  mode: 'offline',
-  step: null,
-  answers: {},
-  card: null,
-  flags: { emergency: false, verdict_request: false },
-  verdictShownFor: null,
-};
+// localStorage can throw on access (blocked site data); then nothing is kept.
+const store = (() => {
+  try {
+    return window.localStorage;
+  } catch {
+    return { getItem: () => null, setItem() {}, removeItem() {} };
+  }
+})();
+
+let state = storage.emptyState();
+let verdictShownFor = null;
+
+const persist = () => storage.save(store, state);
 
 // ---------- small DOM helpers ----------
 
@@ -36,6 +43,7 @@ function el(tag, attrs = {}, ...children) {
 }
 
 function show(viewId) {
+  $('panel').hidden = true;
   for (const view of document.querySelectorAll('.view')) view.hidden = view.id !== viewId;
   window.scrollTo(0, 0);
 }
@@ -77,6 +85,7 @@ function sequence() {
 
 function goTo(id) {
   state.step = id;
+  persist();
   renderQuestion();
 }
 
@@ -92,6 +101,7 @@ function back() {
   const i = seq.indexOf(state.step);
   if (i <= 0) {
     state.step = null;
+    persist();
     renderStart();
   } else {
     goTo(seq[i - 1]);
@@ -107,13 +117,14 @@ function toggleMulti(q, chipId) {
     picked.add(chipId);
   }
   state.answers[q.id] = [...picked];
+  persist();
 }
 
 function renderQuestion() {
   const q = getQuestion(state.step);
   const seq = sequence();
   $('view-question').dataset.step = q.id;
-  $('q-progress').textContent = `${seq.indexOf(q.id) + 1} of about 10`;
+  $('q-progress').textContent = `${seq.indexOf(q.id) + 1} of ${seq.length}`;
   $('q-reason').hidden = !q.reason;
   $('q-reason').textContent = q.reason || '';
   $('q-text').textContent = q.text;
@@ -169,12 +180,14 @@ function onNextClick() {
     state.answers[q.id] = text;
     if (hasEmergencyKeyword(text)) {
       state.flags.emergency = true;
+      persist();
       showEmergency();
       return;
     }
-    if (asksForVerdict(text) && state.verdictShownFor !== text) {
+    if (asksForVerdict(text) && verdictShownFor !== text) {
       state.flags.verdict_request = true;
-      state.verdictShownFor = text;
+      verdictShownFor = text;
+      persist();
       openPanel();
       return;
     }
@@ -184,17 +197,12 @@ function onNextClick() {
 
 // ---------- honest panel ----------
 
-function factLabel({ q, value }) {
-  const chip = getQuestion(q).chips.find((c) => c.id === value);
-  return chip ? chip.label : value;
-}
-
 function openPanel() {
   const facts = buildingFacts(state.answers);
   $('panel-title').textContent = HONEST_PANEL.title;
   $('panel-body').textContent = HONEST_PANEL.body;
   $('panel-facts-lead').textContent = facts.length ? HONEST_PANEL.factsLead : HONEST_PANEL.noFacts;
-  $('panel-facts').replaceChildren(...facts.map((f) => el('li', {}, factLabel(f))));
+  $('panel-facts').replaceChildren(...facts.map((f) => el('li', {}, FACTS[f])));
   $('panel-facts').hidden = !facts.length;
   $('panel-close').textContent = HONEST_PANEL.close;
   $('panel').hidden = false;
@@ -222,7 +230,8 @@ function leaveEmergency() {
 // ---------- card ----------
 
 function finish() {
-  state.card = { ruleOutput: buildCard(state.answers), explanations: {}, wording: 'fixed' };
+  state.card = { ruleOutput: buildCard(state.answers), explanations: {}, wording: 'fixed', ticks: {} };
+  persist();
   renderCard();
 }
 
@@ -248,7 +257,21 @@ function renderCard() {
         return el(
           'li',
           { 'data-action': a.id },
-          el('label', { class: 'action-title' }, el('input', { type: 'checkbox', 'data-tick': a.id }), ' ', def.title),
+          el(
+            'label',
+            { class: 'action-title' },
+            el('input', {
+              type: 'checkbox',
+              'data-tick': a.id,
+              checked: state.card.ticks[a.id] === true,
+              onchange: (e) => {
+                state.card.ticks[a.id] = e.target.checked;
+                persist();
+              },
+            }),
+            ' ',
+            def.title,
+          ),
           el('p', {}, explanation),
           a.variants.map((v) => el('p', { class: 'variant', 'data-variant': v }, VARIANTS[v])),
           a.why.map((w) => el('p', { class: 'why', 'data-why': w }, WHY[w], ' ', el('span', { class: 'tag' }, `[${APP_RULE}]`))),
@@ -261,10 +284,16 @@ function renderCard() {
     el(
       'ul',
       { class: 'engineer' },
-      ruleOutput.engineer.map((id) =>
-        el('li', { 'data-engineer': id }, ENGINEER[id], ENGINEER_SOURCE[id] ? [' ', tagLink(ENGINEER_SOURCE[id])] : null),
-      ),
+      ruleOutput.engineer.map((id) => el('li', { 'data-engineer': id }, ENGINEER[id])),
     ),
+    ruleOutput.process.length
+      ? [
+          el('h3', {}, PROCESS_TITLE),
+          ruleOutput.process.map((id) =>
+            el('p', { class: 'process', 'data-process': id }, PROCESS[id], PROCESS_SOURCE[id] ? [' ', tagLink(PROCESS_SOURCE[id])] : null),
+          ),
+        ]
+      : null,
 
     el('h2', {}, 'What this app cannot judge'),
     el('ul', { class: 'cannot' }, CANNOT_JUDGE.map((t) => el('li', {}, t))),
@@ -279,7 +308,24 @@ function renderCard() {
     ),
     el('p', { class: 'note' }, `${APP_RULE}: the order and the "because you said" lines come from this app's own logic, not from an official source.`),
   );
+  $('card-buttons').replaceChildren(
+    el('button', { type: 'button', class: 'primary', id: 'card-print', onclick: () => window.print() }, 'Print'),
+    el('button', { type: 'button', id: 'card-start-over', onclick: startOver }, 'Start over'),
+    el('button', { type: 'button', id: 'card-clear', onclick: clearAnswers }, 'Clear my answers'),
+  );
   show('view-card');
+}
+
+function startOver() {
+  state = storage.startOver(store, state);
+  verdictShownFor = null;
+  renderStart();
+}
+
+function clearAnswers() {
+  state = storage.clear(store, state.mode);
+  verdictShownFor = null;
+  renderStart();
 }
 
 // ---------- start up ----------
@@ -292,8 +338,19 @@ async function init() {
   $('q-now').addEventListener('click', showEmergency);
   $('panel-close').addEventListener('click', closePanel);
   $('emergency-back').addEventListener('click', leaveEmergency);
+  $('q-free').addEventListener('input', (e) => {
+    state.answers[state.step] = e.target.value;
+    persist();
+  });
+
+  const saved = storage.load(store);
+  if (saved) state = saved;
   state.mode = await detectMode();
-  renderStart();
+  if (saved) persist();
+  // A return visit opens where the person left off: the card, or the same question.
+  if (state.card) renderCard();
+  else if (state.step && questionSequence(state.answers).includes(state.step)) renderQuestion();
+  else renderStart();
 }
 
 init();

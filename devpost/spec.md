@@ -24,7 +24,7 @@ PRD ref: `prd.md > The Core Journey`.
 1. You run `npm start` and open `http://localhost:3000`. The page asks the server `GET /api/mode`; the server answers `live` if `ANTHROPIC_API_KEY` is set, else `offline`. If the request fails (no server, as in the static demo), the page uses `offline`. The Start screen shows the badge.
 2. You press Start. The page reads the question list from `questions.js` and shows Q1. Each chip tap is saved to `localStorage` right away.
 3. When a follow-up's condition is met (`rules.js > followupsFor(answers)`), the page shows it. In live mode it first asks `/api/claude` with task `followup` (fast model) for a friendlier wording of the question; the "Because you said ..." line and the chips are fixed. If the call fails or the wording fails its check, the fixed wording is used.
-4. "Can you tell me if my building is safe?" opens the Honest Panel (fixed text from `content.js`), which lists the building facts given so far. Closing it returns to the same question.
+4. "Can you tell me if my building is safe?" opens the Honest Panel (fixed text from `content.js`), which lists the building facts given so far as plain sentences (`FACTS` in `content.js`). Closing it returns to the same question.
 5. "Something happening right now?" opens the Emergency screen directly.
 6. At Q11 you can type free text. The page first runs `emergency.js > hasEmergencyKeyword(text)` in the browser. A match shows the Emergency screen at once, with no Claude call. In live mode the page then asks `/api/claude` with task `flags` (fast model) for `{emergency, verdict_request}`. `emergency: true` also opens the Emergency screen; `verdict_request: true` opens the Honest Panel. The model can only add flags; a keyword match is never cleared.
 7. After the last question, `rules.js > buildCard(answers)` returns the **rule output**: the ordered action ids with their fixed titles, variants, "why" lines and source tags, the engineer question ids, and the cannot-judge items.
@@ -74,7 +74,7 @@ From `prd.md > Look and Feel`. All in `public/styles.css`, CSS custom properties
 ### Rules Module
 `public/lib/rules.js`. Pure functions, no DOM, no network; imported by the page and by the tests.
 - `followupsFor(answers)` → which of F1-F3 apply (`prd.md > Interview`).
-- `questionSequence(answers)` → ordered list of question ids to ask (Q1-Q10, applicable F1-F3 placed right after their trigger question, then Q11). Used for "N of about 10".
+- `questionSequence(answers)` → ordered list of question ids to ask (Q1-Q10, applicable F1-F3 placed right after their trigger question, then Q11). Used for "N of M" progress (M = length of the sequence).
 - `buildCard(answers)` → rule output (see Data Model): actions on the card (`prd.md > Priority Rules` conditions), order (default A1-A6, child keeps A1 first, older person puts A5 second or first when A1 is absent, ties keep default order), variants (F1 child's room, child items, pet items, help-moving line, stairs line, F2 line), "why" lines tagged "App rule", engineer questions from Q8-Q10 and F3, general questions when no facts.
 - Building facts are never read by the ordering code: the order function takes only household and preparedness answers.
 PRD ref: `prd.md > Priority Rules`, `prd.md > Interview`, `prd.md > Honest Redirect`.
@@ -134,8 +134,9 @@ All in the browser. `localStorage` key `before-the-shake.v1`, one JSON object:
   "flags": { "emergency": false, "verdict_request": false },
   "card": {
     "ruleOutput": {
-      "actions": [ { "id": "A1", "variants": ["childs_room"], "why": ["child_under_5"], "sourceId": 1 } ],
-      "engineer": [ "pre_2000_code", "removed_wall_own_flat", "law_6306_owner" ],
+      "actions": [ { "id": "A1", "variants": ["childs_room"], "why": ["child_first"], "sourceId": 1 } ],
+      "engineer": [ "pre_2000", "removed_my_flat" ],
+      "process": [ "law_6306_owner" ],
       "cannotJudge": [ "structure", "ground", "official_status" ]
     },
     "explanations": { "A1": "..." },

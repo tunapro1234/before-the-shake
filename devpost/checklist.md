@@ -39,7 +39,7 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
   Learner check: Tap "Can you tell me if my building is safe?" mid-interview, then type "I smell gas" in the last box. What do you see each time?
   Commit: `Add honest panel and emergency stop`
 
-- [ ] **4. The card is yours to keep: ticks, return visits, print, clear**
+- [x] **4. The card is yours to keep: ticks, return visits, print, clear**
   Becomes usable: Ticks and the card survive closing the tab; mid-interview reload resumes at the same question; Print gives a one-page A4 card; Start over and Clear my answers work; the full look and feel (paper, ink, teal accent, bundled Source Serif 4 and Source Sans 3).
   Why now: Completes the offline product the learner will see in the video before the live path is layered on.
   PRD ref: `prd.md > Card`, `prd.md > States and Boundaries`, `prd.md > Look and Feel`
@@ -71,7 +71,7 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 3: the four scope proofs in offline mode (two households, honest redirect, 112 stop, offline label)
+- [x] Early usable behavior explored — after slice 3: the four scope proofs in offline mode (two households, honest redirect, 112 stop, offline label)
 - [ ] Final kick-the-tires exploration and feedback completed — after slice 6; the browser run (slice 4 checks plus a slice 1-3 regression) goes to the laptop via main
 
 ## Final Review
@@ -95,3 +95,5 @@ Activity mode:
 - `@anthropic-ai/sdk` pinned to `0.128.0`, not `0.133.0` — the build rule asks for a version at least two weeks on npm; `0.128.0` (2026-09-22) is the newest that qualifies.
 - Added a fixed offline check, `asksForVerdict` in `lib/emergency.js`, so free text asking for a verdict ("Is my building safe?") opens the Honest Panel in offline mode too, as `prd.md` asks. It opens once per text; submitting the same text again makes the card. Live mode adds the model's flag on top.
 - Server overheating (2026-10-11): no headless browser run per slice from slice 4 on. Each slice is verified with `nice -n 19 npm test`; browser checks run only at the two hands-on checkpoints, on the laptop. Slice 4 storage logic goes in a pure `lib/storage.js` so it can be unit-tested.
+- Checkpoint 1 feedback (learner, via main), folded into slice 4: progress is "N of M" with M from `questionSequence`; the Law 6306 and renter lines move under "The official process" below the engineer questions (`buildCard` returns `process`); the Honest Panel shows facts as plain sentences; the Emergency back button reads "Back to the questions"; the A5 helper and neighbour lines merge into one sentence (`who_helps_neighbour`); print uses a smaller base size and small-type sources. `prd.md` and `spec.md` updated to match.
+- Fonts: only three files are bundled (Source Serif 4 Semibold for headings, Source Sans 3 Regular and Semibold for body), from releases `4.005R` and `3.052R`. The release zips carry no license file, so each `OFL.txt` is the `LICENSE.md` from the same release tag in Adobe's repository.

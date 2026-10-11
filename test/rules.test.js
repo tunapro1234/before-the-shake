@@ -46,7 +46,7 @@ test('demo pair: household B has A1 first (child room) and A5 second (stairs lin
   assert.deepEqual(ids(card).slice(0, 2), ['A1', 'A5']);
   assert.ok(byId(card, 'A1').variants.includes('childs_room'));
   assert.ok(byId(card, 'A5').variants.includes('stairs'));
-  assert.ok(byId(card, 'A5').variants.includes('who_helps'));
+  assert.deepEqual(byId(card, 'A5').variants, ['who_helps_neighbour', 'stairs']);
   assert.deepEqual(byId(card, 'A5').why, ['needs_help_second']);
   assert.ok(byId(card, 'A3').variants.includes('child_items'));
 });
@@ -67,13 +67,15 @@ test('if A5 is not on the card (Q6 Yes), the older-person rule has nothing to mo
   assert.deepEqual(ids(card), ['A1', 'A2', 'A3', 'A4', 'A6']);
 });
 
-test('F2 nobody yet or not sure adds the neighbour line', () => {
+test('F2 nobody yet or not sure merges the helper and neighbour lines into one', () => {
   for (const F2 of ['nobody_yet', 'not_sure', undefined]) {
     const card = buildCard({ Q1: ['needs_help'], Q6: 'no', F2 });
-    assert.ok(byId(card, 'A5').variants.includes('ask_neighbour'), String(F2));
+    assert.deepEqual(byId(card, 'A5').variants, ['who_helps_neighbour'], String(F2));
   }
-  const card = buildCard({ Q1: ['needs_help'], Q6: 'no', F2: 'neighbour' });
-  assert.ok(!byId(card, 'A5').variants.includes('ask_neighbour'));
+  for (const F2 of ['neighbour', 'someone_at_home']) {
+    const card = buildCard({ Q1: ['needs_help'], Q6: 'no', F2 });
+    assert.deepEqual(byId(card, 'A5').variants, ['who_helps'], F2);
+  }
 });
 
 test('stairs line only from the 3rd floor up', () => {
@@ -102,13 +104,13 @@ test('building facts never change actions or order', () => {
 
 test('building facts become engineer questions; none means general questions', () => {
   assert.deepEqual(buildCard({}).engineer, ['general_assessment', 'general_code', 'general_who']);
-  assert.deepEqual(buildCard({ Q8: 'before_2000', Q9: ['removed', 'cracks'], F3: 'other_unit', Q10: 'own' }).engineer, [
-    'pre_2000',
-    'removed_other_unit',
-    'cracks',
-    'law_6306_owner',
-  ]);
-  assert.deepEqual(buildCard({ Q9: ['rust'], Q10: 'rent' }).engineer, ['rust', 'rent']);
+  const own = buildCard({ Q8: 'before_2000', Q9: ['removed', 'cracks'], F3: 'other_unit', Q10: 'own' });
+  assert.deepEqual(own.engineer, ['pre_2000', 'removed_other_unit', 'cracks']);
+  assert.deepEqual(own.process, ['law_6306_owner']);
+  const rent = buildCard({ Q9: ['rust'], Q10: 'rent' });
+  assert.deepEqual(rent.engineer, ['rust']);
+  assert.deepEqual(rent.process, ['rent']);
+  assert.deepEqual(buildCard({ Q10: 'not_sure' }).process, []);
 });
 
 test('follow-ups appear only under their conditions, right after their trigger', () => {
@@ -128,5 +130,7 @@ test('a stale follow-up answer is ignored when its condition no longer holds', (
 
 test('building facts for the Honest Panel skip "none" and "not sure"', () => {
   assert.deepEqual(buildingFacts({ Q8: 'not_sure', Q9: ['none'] }), []);
-  assert.equal(buildingFacts({ Q8: 'before_2000', Q9: ['cracks'] }).length, 2);
+  assert.deepEqual(buildingFacts({ Q8: 'before_2000', Q9: ['cracks'] }), ['built_before_2000', 'cracks']);
+  assert.deepEqual(buildingFacts({ Q9: ['removed'], F3: 'my_flat' }), ['removed_my_flat']);
+  assert.deepEqual(buildingFacts({ Q9: ['removed'], F3: 'not_sure' }), ['removed']);
 });

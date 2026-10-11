@@ -61,8 +61,8 @@ export const VARIANTS = {
   child_items: 'Add what a small child needs: diapers, food and any medicine.',
   pet_items: 'Add pet food and a leash.',
   who_helps: 'Decide who helps whom, and the way out.',
+  who_helps_neighbour: 'Agree on one person who helps and on the way out; if nobody at home can help, ask a neighbour.',
   stairs: 'Plan the stairs route, never the lift.',
-  ask_neighbour: 'Agree on one person who helps, and ask a neighbour.',
 };
 
 // "Why" lines, always tagged "App rule": they explain the app's own ordering logic.
@@ -84,12 +84,30 @@ export const ENGINEER = {
   removed_other_unit: 'Was the renovation in the shop or flat below or nearby checked by an engineer, and was the removed wall or column load-bearing?',
   cracks: 'Are these cracks structural? Can you inspect them?',
   rust: 'Is there corrosion in the reinforcement?',
+};
+
+// Statements about the official process, under "The official process" below the engineer questions.
+export const PROCESS_TITLE = 'The official process';
+
+export const PROCESS = {
   law_6306_owner:
     'Under Turkey\'s Law 6306, building owners can have a risky-building assessment done, at their own cost, by an institution licensed by the Urban Transformation Presidency.',
   rent: 'Ask the owner or building manager whether an assessment was done.',
 };
 
-export const ENGINEER_SOURCE = { law_6306_owner: 6 };
+export const PROCESS_SOURCE = { law_6306_owner: 6 };
+
+// Building facts as plain sentences, for the Honest Panel.
+export const FACTS = {
+  built_before_2000: 'Built before 2000',
+  built_2000_to_2018: 'Built between 2000 and 2018',
+  built_after_2018: 'Built after 2018',
+  removed: 'A wall or column was removed in a renovation',
+  removed_my_flat: 'A wall or column was removed in your flat',
+  removed_other_unit: 'A wall or column was removed in a shop or another flat',
+  cracks: 'You noticed cracks in columns or beams',
+  rust: 'You noticed rust or exposed steel in concrete',
+};
 
 export const CANNOT_JUDGE = [
   'Whether your building is safe in an earthquake. Only a licensed engineer with a proper assessment can say that.',
@@ -110,7 +128,7 @@ export const HONEST_PANEL = {
 
 export const EMERGENCY = {
   title: 'Call 112 now',
-  back: 'I am safe, take me back',
+  back: 'Back to the questions',
 };
 
 export const OFFLINE_NOTICE = 'Live connection lost. Continuing in offline mode; your answers are kept.';

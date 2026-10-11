@@ -75,9 +75,9 @@ function orderActions(answers) {
 
   const a5 = find('A5');
   if (a5 && h.needsHelp) {
-    a5.variants.push('who_helps');
+    // With nobody to help yet, the helper line and the neighbour line become one sentence.
+    a5.variants.push(isIn(answers, 'F2', ['nobody_yet', 'not_sure']) ? 'who_helps_neighbour' : 'who_helps');
     if (isIn(answers, 'Q2', ['floor_3_to_6', 'floor_7_plus'])) a5.variants.push('stairs');
-    if (isIn(answers, 'F2', ['nobody_yet', 'not_sure'])) a5.variants.push('ask_neighbour');
     // A5 moves to second place, right after A1, or to the top when A1 is not on the card.
     actions.splice(actions.indexOf(a5), 1);
     const target = a1 ? 1 : 0;
@@ -88,30 +88,39 @@ function orderActions(answers) {
   return actions;
 }
 
+function removedWhere(answers) {
+  const where = one(answers, 'F3');
+  return where === 'my_flat' ? 'removed_my_flat' : where === 'other_unit' ? 'removed_other_unit' : 'removed';
+}
+
 function engineerQuestions(answers) {
   const facts = [];
   if (one(answers, 'Q8') === 'before_2000') facts.push('pre_2000');
   const seen = many(answers, 'Q9');
-  if (seen.includes('removed')) {
-    const where = one(answers, 'F3');
-    facts.push(where === 'my_flat' ? 'removed_my_flat' : where === 'other_unit' ? 'removed_other_unit' : 'removed');
-  }
+  if (seen.includes('removed')) facts.push(removedWhere(answers));
   if (seen.includes('cracks')) facts.push('cracks');
   if (seen.includes('rust')) facts.push('rust');
-
-  const list = facts.length ? facts : ['general_assessment', 'general_code', 'general_who'];
-  const tenure = one(answers, 'Q10');
-  if (tenure === 'own') list.push('law_6306_owner');
-  if (tenure === 'rent') list.push('rent');
-  return list;
+  return facts.length ? facts : ['general_assessment', 'general_code', 'general_who'];
 }
 
-// The facts the person gave about the building, for the Honest Panel.
+// Statements about the official process, shown under the engineer questions.
+function officialProcess(answers) {
+  const tenure = one(answers, 'Q10');
+  if (tenure === 'own') return ['law_6306_owner'];
+  if (tenure === 'rent') return ['rent'];
+  return [];
+}
+
+const BUILT = { before_2000: 'built_before_2000', from_2000_to_2018: 'built_2000_to_2018', after_2018: 'built_after_2018' };
+
+// The facts the person gave about the building, as ids of plain sentences for the Honest Panel.
 export function buildingFacts(answers = {}) {
   const facts = [];
-  if (answers.Q8 && answers.Q8 !== 'not_sure') facts.push({ q: 'Q8', value: answers.Q8 });
-  for (const v of many(answers, 'Q9')) if (!['none', 'not_sure'].includes(v)) facts.push({ q: 'Q9', value: v });
-  if (answers.F3 && answers.F3 !== 'not_sure') facts.push({ q: 'F3', value: answers.F3 });
+  if (BUILT[answers.Q8]) facts.push(BUILT[answers.Q8]);
+  const seen = many(answers, 'Q9');
+  if (seen.includes('removed')) facts.push(removedWhere(answers));
+  if (seen.includes('cracks')) facts.push('cracks');
+  if (seen.includes('rust')) facts.push('rust');
   return facts;
 }
 
@@ -119,5 +128,6 @@ export function buildCard(answers = {}) {
   return {
     actions: orderActions(answers),
     engineer: engineerQuestions(answers),
+    process: officialProcess(answers),
   };
 }

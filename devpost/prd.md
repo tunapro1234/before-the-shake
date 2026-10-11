@@ -12,7 +12,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > Who It's For`.
 Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`.
 
 1. On an uneasy evening (a tremor or drill in the news, or the week of a move), the person opens the app and sees the Start screen: what it is, what it is not, a live/offline badge, and a quiet "In an emergency, call 112" line. They press Start.
-2. They answer about 10 questions, one per screen, by tapping answer chips. Every question has a "Not sure" chip. They can go Back. Progress reads like "4 of about 10".
+2. They answer about 10 questions, one per screen, by tapping answer chips. Every question has a "Not sure" chip. They can go Back. Progress reads like "4 of 11".
 3. When an answer needs it, one of three fixed follow-up questions appears and says why: "Because you said there is a child under 5: ...".
 4. Near the end there is one optional free-text box: "Anything else about your home?".
 5. At any question they can tap "Can you tell me if my building is safe?". A short honest panel explains that only a licensed engineer can say, and the facts they gave are added to the engineer questions on the card. Then they continue.
@@ -36,7 +36,7 @@ Single column that works on a phone. Five surfaces:
 - One question per screen.
 - Answer chips, always including "Not sure". No free typing at each step, on purpose: it keeps the flow calm and predictable.
 - Back button.
-- Progress: "N of about 10", counting base questions plus the follow-ups that apply.
+- Progress: "N of M", where M counts base questions plus the follow-ups that apply; when a follow-up adds a screen, M grows and the follow-up's "Because you said" line explains why.
 - Follow-up questions carry a one-line reason: "Because you said ...".
 - Link on every question screen: "Can you tell me if my building is safe?".
 - Small fixed link on every question screen: "Something happening right now?", which opens the Emergency screen.
@@ -50,12 +50,12 @@ Single column that works on a phone. Five surfaces:
 
 ### Emergency Screen
 - Shown from the "Something happening right now?" link, or when the free text trips the emergency check (see Emergency Stop).
-- Shows only "Call 112 now" and a way to come back later. Nothing else.
+- Shows only "Call 112 now" and "Back to the questions". Nothing else.
 - The only place red is used.
 
 ### Card Screen
 - Section 1, "This week": actions in priority order, each with a checkbox and a source tag.
-- Section 2, "Questions for an engineer": questions for a licensed engineer or the official risky-building process, built from the building facts given.
+- Section 2, "Questions for an engineer": questions for a licensed engineer, built from the building facts given. Below them, a small subheading "The official process" holds the Law 6306 line (owners) or the "ask the owner or building manager" line (renters).
 - Section 3, "What this app cannot judge".
 - Print button, Start over button, "Clear my answers" button.
 - Short sources list at the bottom.
@@ -96,14 +96,14 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The POC Boundary`.
 | # | Asked when | Question | Chips | Effect |
 |---|---|---|---|---|
 | F1 | Q1 has "A child under 5" and Q3 is "Yes, not fixed" or "Not sure" | "Because you said there is a child under 5: does the child sleep in a room with that furniture?" | Yes / No | Yes or Not sure: A1 says "start with the child's room". |
-| F2 | Q1 has "Someone older or who needs help moving" | "Because you said someone at home needs help moving: who would help them get out?" | Someone at home / A neighbour / Nobody yet | Nobody yet or Not sure: A5 adds "agree on one person who helps, and ask a neighbour". |
+| F2 | Q1 has "Someone older or who needs help moving" | "Because you said someone at home needs help moving: who would help them get out?" | Someone at home / A neighbour / Nobody yet | Nobody yet or Not sure: the A5 helper line becomes one sentence, "agree on one person who helps and on the way out; if nobody at home can help, ask a neighbour". |
 | F3 | Q9 has "A wall or column removed" | "Because you said a wall or column was removed: where was it?" | In my flat / In a shop or another flat | Only changes the wording of the engineer question, never the actions. |
 
 - Which questions and follow-ups are asked, and in what order, is fixed by the rules. In live mode the model only words the follow-ups; offline mode uses fixed wording.
 - The free-text answer is turned into known flags (an emergency, or a request for a verdict). Free text that matches no known flag never changes actions or order.
   - [ ] Every question and follow-up shows a "Not sure" chip.
   - [ ] Back returns to the previous question with the earlier answer kept.
-  - [ ] Progress shows "N of about 10", counting base questions plus applicable follow-ups.
+  - [ ] Progress shows "N of M", with M counting base questions plus applicable follow-ups.
   - [ ] Each follow-up appears only under its condition and starts with "Because you said ...".
 
 ### Priority Rules
@@ -124,7 +124,7 @@ Source: `scope.md > The POC Boundary`, `scope.md > Explicitly Cut`.
 
 **Modifiers** (simple points; ties keep the default order; every move shows "why: because you said ..."):
 - Child under 5: A1 stays at the top if furniture is not fixed (children sleep in those rooms); with F1 Yes or Not sure, A1 says "start with the child's room". A3 gets child items (diapers, food, medicine).
-- Someone older or who needs help moving: A5 moves to second place (right after A1, or first if A1 is not on the card) and includes "who helps whom and the way out". If the floor is 3rd or higher too, A5 says "plan the stairs route, never the lift". F2 Nobody yet or Not sure: A5 adds "agree on one person who helps, and ask a neighbour".
+- Someone older or who needs help moving: A5 moves to second place (right after A1, or first if A1 is not on the card) and includes "who helps whom and the way out". If the floor is 3rd or higher too, A5 says "plan the stairs route, never the lift". F2 Nobody yet or Not sure: the helper line and the neighbour line merge into one sentence.
 - Pet: A3 gets pet food and a leash.
 - If A5 is not on the card (Q6 Yes), the older-person rule has nothing to move.
 
@@ -160,6 +160,7 @@ Source: `scope.md > The Unique Kernel` ("each with a source tag").
 ### Honest Redirect
 Source: `scope.md > The Unique Kernel` ("oh, that's cool" moment).
 - The app never says a building is safe or unsafe, and shows no score or risk percentage.
+- The panel lists the building facts given so far as plain sentences ("Built before 2000", "A wall or column was removed in your flat").
 - Asking "is my building safe?" (link or free text) opens the Honest Panel and turns the given building facts (year range, visible cracks, a removed wall) into two or three concrete engineer questions.
   - [ ] Tapping the link on any question screen opens the panel; closing it returns to the same question.
   - [ ] After the person gave building facts, the card's engineer section contains questions that mention those facts.
@@ -171,7 +172,7 @@ Source: `scope.md > The POC Boundary`.
 - No answer chip mentions an emergency, on purpose: this is a preparedness tool.
 - Two ways in: the small "Something happening right now?" link on every question screen, and the free text.
 - Free text goes through a fixed keyword check (gas, smell, trapped, injured, bleeding, fire, collapse) in both modes, and the check always wins. In live mode the model can also raise the emergency flag, but it can never clear one.
-- The screen shows only "Call 112 now" and a way to come back later. 112 is the only number shown anywhere in the app.
+- The screen shows only "Call 112 now" and "Back to the questions". 112 is the only number shown anywhere in the app.
   - [ ] Tapping "Something happening right now?" on any question screen shows the Emergency screen immediately.
   - [ ] Typing "I smell gas" in the free-text box shows the Emergency screen, in live and offline mode.
   - [ ] A keyword match shows the Emergency screen even if the model says there is no emergency.
@@ -185,7 +186,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > What "Working" Looks Like`.
 - Print, Start over, Clear my answers.
   - [ ] The card has exactly three sections in the stated order, plus a sources list.
   - [ ] Every action in "This week" shows a source tag.
-  - [ ] Print aims for one A4 page and prints on A4 with nothing cut off.
+  - [ ] Print aims for one A4 page and prints on A4 with nothing cut off (smaller base size and small-type sources in print).
   - [ ] If the live text drops an action or changes the order, the card shows the fixed wording instead.
   - [ ] Ticks survive closing and reopening the tab in the same browser.
   - [ ] "Clear my answers" removes the answers, card and ticks from this browser.
