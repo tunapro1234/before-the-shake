@@ -37,3 +37,9 @@ textarea { width: 100%; font: inherit; padding: 10px; border: 1px solid var(--ru
 input[type="checkbox"] { accent-color: var(--accent); width: 20px; height: 20px; }
 .card-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .sources a { overflow-wrap: anywhere; }
+.links { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 32px; border-top: 1px solid var(--rule); padding-top: 12px; }
+button.link { min-height: 44px; padding: 4px 0; border: 0; background: none; color: var(--accent); text-decoration: underline; font-size: 0.9rem; }
+.panel { position: fixed; inset: 0; overflow: auto; background: var(--paper); padding: 24px 16px; }
+.panel > * { max-width: 38rem; margin-left: auto; margin-right: auto; }
+#view-emergency { text-align: center; padding-top: 25vh; }
+.call { display: block; color: var(--emergency); font-family: Georgia, serif; font-size: 2.6rem; font-weight: 700; text-decoration: none; margin-bottom: 48px; }

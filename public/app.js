@@ -1,8 +1,11 @@
 // Screens and flow. The rules module decides the card; this file only shows it.
 
 import { getQuestion } from './lib/questions.js';
-import { questionSequence, buildCard } from './lib/rules.js';
-import { ACTIONS, VARIANTS, WHY, ENGINEER, ENGINEER_SOURCE, CANNOT_JUDGE, START, ORDER_NOTE } from './lib/content.js';
+import { questionSequence, buildCard, buildingFacts } from './lib/rules.js';
+import { hasEmergencyKeyword, asksForVerdict } from './lib/emergency.js';
+import {
+  ACTIONS, VARIANTS, WHY, ENGINEER, ENGINEER_SOURCE, CANNOT_JUDGE, START, ORDER_NOTE, HONEST_PANEL, EMERGENCY,
+} from './lib/content.js';
 import { SOURCES, APP_RULE, tagLabel } from './lib/sources.js';
 
 const state = {
@@ -10,6 +13,8 @@ const state = {
   step: null,
   answers: {},
   card: null,
+  flags: { emergency: false, verdict_request: false },
+  verdictShownFor: null,
 };
 
 // ---------- small DOM helpers ----------
@@ -159,8 +164,59 @@ function renderQuestion() {
 
 function onNextClick() {
   const q = getQuestion(state.step);
-  if (q.freeText) state.answers[q.id] = $('q-free').value.trim();
+  if (q.freeText) {
+    const text = $('q-free').value.trim();
+    state.answers[q.id] = text;
+    if (hasEmergencyKeyword(text)) {
+      state.flags.emergency = true;
+      showEmergency();
+      return;
+    }
+    if (asksForVerdict(text) && state.verdictShownFor !== text) {
+      state.flags.verdict_request = true;
+      state.verdictShownFor = text;
+      openPanel();
+      return;
+    }
+  }
   next();
+}
+
+// ---------- honest panel ----------
+
+function factLabel({ q, value }) {
+  const chip = getQuestion(q).chips.find((c) => c.id === value);
+  return chip ? chip.label : value;
+}
+
+function openPanel() {
+  const facts = buildingFacts(state.answers);
+  $('panel-title').textContent = HONEST_PANEL.title;
+  $('panel-body').textContent = HONEST_PANEL.body;
+  $('panel-facts-lead').textContent = facts.length ? HONEST_PANEL.factsLead : HONEST_PANEL.noFacts;
+  $('panel-facts').replaceChildren(...facts.map((f) => el('li', {}, factLabel(f))));
+  $('panel-facts').hidden = !facts.length;
+  $('panel-close').textContent = HONEST_PANEL.close;
+  $('panel').hidden = false;
+  $('panel-close').focus();
+}
+
+function closePanel() {
+  $('panel').hidden = true;
+  renderQuestion();
+}
+
+// ---------- emergency ----------
+
+function showEmergency() {
+  $('emergency-call').textContent = EMERGENCY.title;
+  $('emergency-back').textContent = EMERGENCY.back;
+  show('view-emergency');
+}
+
+function leaveEmergency() {
+  if (state.step) renderQuestion();
+  else renderStart();
 }
 
 // ---------- card ----------
@@ -232,6 +288,10 @@ async function init() {
   $('start-button').addEventListener('click', () => goTo(sequence()[0]));
   $('q-back').addEventListener('click', back);
   $('q-next').addEventListener('click', onNextClick);
+  $('q-safe').addEventListener('click', openPanel);
+  $('q-now').addEventListener('click', showEmergency);
+  $('panel-close').addEventListener('click', closePanel);
+  $('emergency-back').addEventListener('click', leaveEmergency);
   state.mode = await detectMode();
   renderStart();
 }

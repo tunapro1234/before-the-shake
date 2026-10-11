@@ -30,6 +30,23 @@
         <button type="button" id="q-back">Back</button>
         <button type="button" class="primary" id="q-next" hidden>Next</button>
       </div>
+      <p class="links">
+        <button type="button" class="link" id="q-safe">Can you tell me if my building is safe?</button>
+        <button type="button" class="link" id="q-now">Something happening right now?</button>
+      </p>
+
+      <div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title" hidden>
+        <h2 id="panel-title"></h2>
+        <p id="panel-body"></p>
+        <p id="panel-facts-lead"></p>
+        <ul id="panel-facts"></ul>
+        <button type="button" class="primary" id="panel-close"></button>
+      </div>
+    </section>
+
+    <section id="view-emergency" class="view" hidden>
+      <a class="call" id="emergency-call" href="tel:112"></a>
+      <button type="button" id="emergency-back"></button>
     </section>
 
     <section id="view-card" class="view" hidden>

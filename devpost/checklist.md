@@ -29,7 +29,7 @@ Build mode: fast (learner choice, stated in `1-start` and confirmed at the start
   Learner check: Run the app twice as household A and household B from the PRD and compare the two cards.
   Commit: `Add household rules, follow-ups and engineer questions`
 
-- [ ] **3. The app stays honest and stops for emergencies**
+- [x] **3. The app stays honest and stops for emergencies**
   Becomes usable: "Can you tell me if my building is safe?" on every question opens the Honest Panel with the facts given so far and returns to the same question; "Something happening right now?" opens the Emergency screen; free text with an emergency phrase opens the Emergency screen (only "Call 112 now", the only red); a way to come back later.
   Why now: The honest line and the 112 stop are the hard boundaries and two of the four demo proofs; they must work before any live wording is added.
   PRD ref: `prd.md > Honest Panel`, `prd.md > Emergency Screen`, `prd.md > Honest Redirect`, `prd.md > Emergency Stop`
@@ -93,3 +93,4 @@ Activity mode:
 ## Revisions
 
 - `@anthropic-ai/sdk` pinned to `0.128.0`, not `0.133.0` — the build rule asks for a version at least two weeks on npm; `0.128.0` (2026-09-22) is the newest that qualifies.
+- Added a fixed offline check, `asksForVerdict` in `lib/emergency.js`, so free text asking for a verdict ("Is my building safe?") opens the Honest Panel in offline mode too, as `prd.md` asks. It opens once per text; submitting the same text again makes the card. Live mode adds the model's flag on top.
