@@ -31,6 +31,27 @@ test('digits, percent signs and blocked phrases fail', () => {
   }
 });
 
+test('reassurance about the building fails, furniture words pass', () => {
+  for (const bad of [
+    'Your building should hold up fine.',
+    'Older blocks here usually hold up.',
+    'Your flat should be fine in most shaking.',
+    'The frame looks sturdy.',
+    'Concrete like this is solid.',
+    'There is nothing to worry about, just fix the shelves.',
+  ]) {
+    const card = good();
+    card.actions[1].explanation = bad;
+    assert.equal(checkCardText(ruleOutput, card), false, bad);
+  }
+  for (const ok of ['Get under a sturdy table and hold on until it stops.', 'Sturdy desks work too.', 'Consolidate the bag in one place.']) {
+    const card = good();
+    card.actions[1].explanation = ok;
+    assert.equal(checkCardText(ruleOutput, card), true, ok);
+  }
+  assert.equal(checkFollowupText('Is your block solid?'), false);
+});
+
 test('empty, too long, wrong type and extra keys fail', () => {
   for (const bad of ['', '   ', 'x'.repeat(241), 42, null]) {
     const card = good();

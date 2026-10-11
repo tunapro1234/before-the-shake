@@ -48,7 +48,7 @@ If the connection fails, the app switches to offline mode, says so, and keeps ev
 ## How Claude is kept inside the lines
 
 - **The rules decide, Claude words.** Which actions go on the card and in what order comes from fixed rules in `public/lib/rules.js`. Claude never sees the person's raw answers for the card, only the titles and lines the rules already chose.
-- **The answer is checked before it is shown.** Claude returns JSON keyed by action id (`public/lib/validate.js`). The ids must match the rule output exactly, in the same order. Each explanation must be short, contain no digits or `%`, and avoid phrases like "building is safe" or "risk score". Titles, sources and engineer questions always come from the app's own text.
+- **The answer is checked before it is shown.** Claude returns JSON keyed by action id (`public/lib/validate.js`). The ids must match the rule output exactly, in the same order. Each explanation must be short, contain no digits or `%`, and avoid phrases like "building is safe" or "risk score". Reassurance counts too: "should be fine", "hold up", "solid", "sturdy" and "nothing to worry" are refused ("a sturdy table" for Drop, Cover, Hold On is allowed). Titles, sources and engineer questions always come from the app's own text.
 - **Any failure falls back to fixed wording.** An API error, a refusal or `max_tokens` stop, text that does not parse, or JSON that fails the check: in all four cases the card shows the fixed explanations and a "Fixed wording" note.
 - **The emergency check does not depend on the model.** A fixed phrase check (`public/lib/emergency.js`) runs in the browser first. Claude can add an emergency flag, never clear one.
 

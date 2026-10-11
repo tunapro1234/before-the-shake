@@ -94,7 +94,7 @@ PRD ref: `prd.md > Emergency Stop`.
 
 ### Card Text Check
 `public/lib/validate.js`. The fence around the model; this is the learner's chosen approach (see Decisions).
-- `checkCardText(ruleOutput, json)` passes only if: `json` is an object with an `actions` array; the list of `id`s equals the rule output's id list exactly, same length and same order; every `explanation` is a string of 1-240 characters; no explanation contains a digit, `%`, or the blocked phrases (`safe building`, `building is safe`, `unsafe`, `risk score`, `percent`, `guarantee`); no extra keys beyond `id` and `explanation`.
+- `checkCardText(ruleOutput, json)` passes only if: `json` is an object with an `actions` array; the list of `id`s equals the rule output's id list exactly, same length and same order; every `explanation` is a string of 1-240 characters; no explanation contains a digit, `%`, or the blocked phrases (`safe building`, `building is safe`, `unsafe`, `risk score`, `percent`, `guarantee`) or reassurance words matched as whole words (`hold up`/`holds up`, `should be fine`, `sturdy`, `solid`, `nothing to worry`; only `sturdy table`/`sturdy desk` is allowed, for Drop, Cover, Hold On); no extra keys beyond `id` and `explanation`.
 - `checkFollowupText(text)` passes only if: 1-160 characters, ends with `?`, no digit, no blocked phrase.
 - On fail, the caller uses the fixed text from `content.js`. Titles, order, tags, engineer questions and cannot-judge items are never taken from the model, so a reworded explanation cannot change them.
 PRD ref: `prd.md > Card`, `prd.md > Live and Offline Modes`.

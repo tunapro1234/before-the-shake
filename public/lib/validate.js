@@ -3,6 +3,11 @@
 
 const BLOCKED = ['safe building', 'building is safe', 'unsafe', 'risk score', 'percent', 'guarantee'];
 
+// Reassurance is a verdict too, even without a number or the word "safe". The one fixed use of
+// "sturdy" is furniture in Drop, Cover, Hold On, so that phrase is taken out before the check.
+const REASSURANCE = [/\bhold(s)? up\b/, /\bshould be fine\b/, /\bsturdy\b/, /\bsolid\b/, /\bnothing to worry\b/];
+const FURNITURE = /\bsturdy (table|desk)s?\b/g;
+
 const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
 function cleanText(text, max) {
@@ -11,7 +16,9 @@ function cleanText(text, max) {
   if (t.length < 1 || t.length > max) return false;
   if (/[0-9%]/.test(t)) return false;
   const lower = t.toLowerCase();
-  return !BLOCKED.some((phrase) => lower.includes(phrase));
+  if (BLOCKED.some((phrase) => lower.includes(phrase))) return false;
+  const rest = lower.replace(FURNITURE, ' ');
+  return !REASSURANCE.some((re) => re.test(rest));
 }
 
 // Passes only if the model kept every action of the rule output, in the same order, added none,
