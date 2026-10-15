@@ -124,6 +124,7 @@ function renderStart() {
   $('start-lead').textContent = START.lead;
   $('start-not').textContent = START.notThis;
   $('start-emergency').textContent = START.emergencyLine;
+  $('start-disclaimer').textContent = START.disclaimer;
   show('view-start');
 }
 

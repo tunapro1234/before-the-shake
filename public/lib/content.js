@@ -10,6 +10,8 @@ export const START = {
   notThis:
     'It does not tell you whether your building is safe. Only a licensed engineer with a proper assessment can say that.',
   emergencyLine: 'In an emergency, call 112.',
+  disclaimer:
+    'A student project for the Build With AI: Basics hackathon. It is not an official service and not engineering advice.',
 };
 
 export const ACTIONS = {

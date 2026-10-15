@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildCard } from '../public/lib/rules.js';
 import { cardView } from '../public/lib/cardview.js';
-import { PROCESS } from '../public/lib/content.js';
+import { PROCESS, START } from '../public/lib/content.js';
 
 const householdB = {
   Q1: ['child_under_5', 'needs_help'], F2: 'nobody_yet', Q2: 'floor_3_to_6', Q3: 'not_fixed', F1: 'yes', Q6: 'no',
@@ -49,4 +49,13 @@ test('model explanations show only when the card wording is "model"; fallback sh
   assert.notEqual(cardView({ ruleOutput, explanations, wording: 'fixed', ticks: {} }).actions[0].explanation, 'Model words.');
   assert.equal(cardView({ ruleOutput, explanations, wording: 'model', ticks: {} }).actions[0].explanation, 'Model words.');
   assert.equal(cardView({ ruleOutput, explanations: {}, wording: 'fixed', fallback: true, ticks: {} }).status, 'Fixed wording');
+});
+
+test('the start screen carries the disclaimer, with no number but 112', () => {
+  assert.equal(typeof START.disclaimer, 'string');
+  assert.ok(START.disclaimer.length > 0);
+  assert.deepEqual(START.disclaimer.match(/\d+/g) || [], []);
+  for (const text of Object.values(START)) {
+    for (const n of text.match(/\d+/g) || []) assert.equal(n, '112', text);
+  }
 });
