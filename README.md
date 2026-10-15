@@ -45,6 +45,8 @@ In live mode Claude rewords the follow-up questions (`CLAUDE_MODEL_FAST`, defaul
 
 If the connection fails, the app switches to offline mode, says so, and keeps every answer.
 
+Live mode has not been run against the real API yet. The demo video shows offline mode, and the model side is covered only by the stubbed tests described below.
+
 ## How Claude is kept inside the lines
 
 - **The rules decide, Claude words.** Which actions go on the card and in what order comes from fixed rules in `public/lib/rules.js`. Claude never sees the person's raw answers for the card, only the titles and lines the rules already chose.
@@ -67,7 +69,9 @@ All checked on 2026-10-11. The order of the actions and the "Because you said" l
 
 ## How this was built
 
-Built with Claude Code running the Devpost Learn skill pack for the Build With AI: Basics hackathon. The planning documents are in `devpost/`: `scope.md`, `prd.md`, `spec.md` and the build `checklist.md`. An AI agent answered the planning interviews on my behalf, based on my background.
+Tuna, a civil engineering student in Istanbul, entered the Build With AI: Basics hackathon with an AI agent team. The agents proposed the idea from Tuna's background and ran the Devpost Learn skill pack in Claude Code: an AI agent answered the planning interviews on Tuna's behalf and gave the approvals recorded in the planning documents, and the agents wrote the code and this README. Where the planning documents say "the learner", they mean those answers.
+
+The planning documents are in `devpost/`: `scope.md`, `prd.md`, `spec.md` and the build `checklist.md`. The narration in the demo video is a synthetic voice.
 
 ## License
 
