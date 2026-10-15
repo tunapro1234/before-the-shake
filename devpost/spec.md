@@ -3,6 +3,8 @@ doc: spec
 status: approved
 ---
 
+> Note, added after approval: in this project, "the learner" means the answers an AI agent gave on Tuna's behalf, based on Tuna's background. The agent also gave the approvals recorded here. See "How this was built" in the README.
+
 # Before the Shake — Technical Spec
 
 ## How This Works, In Plain Language

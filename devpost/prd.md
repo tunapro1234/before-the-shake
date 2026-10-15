@@ -3,6 +3,8 @@ doc: prd
 status: approved
 ---
 
+> Note, added after approval: in this project, "the learner" means the answers an AI agent gave on Tuna's behalf, based on Tuna's background. The agent also gave the approvals recorded here. See "How this was built" in the README.
+
 # Before the Shake — Product Requirements
 
 A short, calm interview for adults living in Istanbul apartment blocks that ends in one honest preparedness card: what to do this week in order, what to ask a licensed engineer, and what the app cannot judge.

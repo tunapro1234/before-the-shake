@@ -3,6 +3,8 @@ doc: scope
 status: approved
 ---
 
+> Note, added after approval: in this project, "the learner" means the answers an AI agent gave on Tuna's behalf, based on Tuna's background. The agent also gave the approvals recorded here. See "How this was built" in the README.
+
 # Before the Shake
 
 A short interview for people in Istanbul apartments that ends in one honest preparedness card: what to do this week, what to ask an engineer, and what the app cannot judge.
