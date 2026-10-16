@@ -39,7 +39,7 @@ Learning goal: keeping an LLM inside hard safety boundaries while it is still us
 
 ## What "Working" Looks Like
 Someone runs it locally (one command, README) or opens an optional static demo in offline mode. They answer about 10 questions, see a follow-up appear when an answer needs it, and get the card with its three parts. Two modes:
-- Live mode, with Claude running the interview and writing the card in plain language.
+- Live mode, with Claude running the interview and writing the card in plain language. (Note, added after approval: as built, fixed rules choose the questions and the actions; Claude rewords the follow-ups and writes the explanations.)
 - Offline mode with no API key, same flow, with a visible "offline mode" label.
 
 Proof in the video:

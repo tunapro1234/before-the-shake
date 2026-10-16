@@ -59,7 +59,7 @@ Unverified, check early in the build: the exact `output_config: { format: { type
 - **Setup:** `npm install`, then `cp .env.example .env` and add `ANTHROPIC_API_KEY` for live mode (optional). Optional `CLAUDE_MODEL_FAST` (default `claude-haiku-5-5`) and `CLAUDE_MODEL_CARD` (default `claude-opus-5-5`), `PORT` (default `3000`).
 - **Start:** `npm start` (runs `node --env-file-if-exists=.env server/server.js`; flag to verify in the build, fallback: load `.env` with a few lines in `server.js`). Open `http://localhost:3000`.
 - **Tests:** `npm test` (runs `node --test`).
-- **Demo recording:** local, live mode for the main run; then restart without the key for the offline run. Show the four proofs from `scope.md > What "Working" Looks Like` with the demo pair from `prd.md > Priority Rules`.
+- **Demo recording:** local, live mode for the main run; then restart without the key for the offline run. (Note, added after approval: live mode has not been run against the real API; the demo video shows offline mode only.) Show the four proofs from `scope.md > What "Working" Looks Like` with the demo pair from `prd.md > Priority Rules`.
 - **Submission:** short demo video + public GitHub repository (required). The planning docs `devpost/scope.md`, `devpost/prd.md`, `devpost/spec.md` are in the repo.
 - **Optional public demo (learner choice):** offline mode only, the `public/` folder served as static files, no key, no live calls, no server route. Only after the local version works; hosting details decided at the end of `5-build`.
 
